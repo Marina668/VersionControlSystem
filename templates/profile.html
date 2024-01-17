@@ -1,7 +1,21 @@
-{% block title %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <title>Home page</title>
-{% endblock %}
 
-{% block content %}
-    <h1>Home page</h1>
-{% endblock %}
+</head>
+<body>
+
+<h1>Home page</h1>
+
+{% if request.user.is_authenticated %}
+  <p>{{ request.user.username }}</p>
+  <a href="{% url 'logout' %}">Log out</a>
+{% else %}
+  <a href="{% url 'login' %}">Login</a><br>
+  <a href="{% url 'signup' %}">Sign up</a>
+{% endif %}
+
+</body>
+</html>

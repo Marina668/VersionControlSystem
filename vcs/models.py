@@ -3,21 +3,21 @@ import uuid
 from django.urls import reverse
 
 
-class User(models.Model):
-    """
-    Model representing a system user
-    """
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    login = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
-
-    def __str__(self):
-        """
-        String for representing the Model object (in Admin site etc.)
-        """
-        return self.login
+# class User(models.Model):
+#     """
+#     Model representing a system user
+#     """
+#
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+#     login = models.CharField(max_length=255, unique=True)
+#     email = models.EmailField(max_length=255, unique=True)
+#     password = models.CharField(max_length=255)
+#
+#     def __str__(self):
+#         """
+#         String for representing the Model object (in Admin site etc.)
+#         """
+#         return self.login
 
 
 class Repository(models.Model):
@@ -27,7 +27,7 @@ class Repository(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255)
-    author_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
 
     def __str__(self):
         """
@@ -50,7 +50,7 @@ class Milestone(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     description = models.TextField(max_length=1000)
     created = models.DateTimeField(auto_now_add=True)
-    author_id = models.ForeignKey('User', on_delete=models.CASCADE)
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
 
     def __str__(self):
         """
@@ -65,8 +65,8 @@ class Change(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    repo_id = models.ForeignKey('Repository', on_delete=models.CASCADE)
-    milestone_id = models.ForeignKey('Milestone', on_delete=models.CASCADE)
+    repo = models.ForeignKey('Repository', on_delete=models.CASCADE)
+    milestone = models.ForeignKey('Milestone', on_delete=models.CASCADE)
     item = models.CharField(max_length=255)
 
     CHANGES = (
@@ -84,5 +84,5 @@ class UserRepo(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
-    repo_id = models.ForeignKey('Repository', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    repo = models.ForeignKey('Repository', on_delete=models.CASCADE)

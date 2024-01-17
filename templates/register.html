@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+
+<body>
+
+<form method="POST" action="{% url 'register' %}">
+{% csrf_token %}
+    {{ form }}  
+    
+{#<table>#}
+{#<tr>#}
+{#  <td>{{ form.username.label_tag }}</td>#}
+{#  <td>{{ form.username }}</td>#}
+{#</tr>#}
+{##}
+{#<tr>#}
+{#  <td>{{ form.password.label_tag }}</td>#}
+{#  <td>{{ form.password }}</td>#}
+{#</tr>#}
+{#</table>#}
+    
+
+<input type="submit" value="register" />
+{#<input type="hidden" name="next" value="{{ next }}" />#}
+</form>
+
+</body>
+</html>
+
