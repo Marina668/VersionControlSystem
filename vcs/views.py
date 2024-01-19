@@ -22,3 +22,7 @@ def newRepo(request):
 
 class RepositoryListView(generic.ListView):
     model = Repository
+
+
+class RepoDetailView(generic.DetailView):
+    model = Repository
