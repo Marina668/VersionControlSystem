@@ -2,5 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.profile_view, name='profile'),
+    path('', views.profileView, name='profile'),
+    path('repositories/', views.RepositoryListView.as_view(), name='repositories'),
+    path('newrepo/', views.newRepo, name='newrepo'),
 ]

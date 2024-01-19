@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+
+from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 
@@ -28,6 +30,7 @@ class Repository(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    slug = models.SlugField(default="", null=False)
 
     def __str__(self):
         """
@@ -39,7 +42,12 @@ class Repository(models.Model):
         """
         Returns the url to access a particular repository information.
         """
-        return reverse('repository-detail', args=[str(self.id)])
+        return reverse('repository-detail', kwargs={"slug": self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class Milestone(models.Model):

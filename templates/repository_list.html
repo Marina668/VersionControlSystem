@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Repositories</title>
+</head>
+<body>
+
+<h1>Repository List</h1>
+
+    {% if repository_list %}
+    <ul>
+      {% for repo in repository_list %}
+      <li>
+        <a href="{{ repo.get_absolute_url }}">{{ repo.name }}</a>
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no repositories.</p>
+    {% endif %}
+
+</body>
+</html>
