@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'vcs/styles.css' %}">
+    <title>{% block title %}TinyVCS{% endblock %}</title>
+</head>
+<body>
+<div class="header">
+    <img src="{% static 'vcs/logo.png' %}"/>
+
+    <div class="auth-buttons-block">
+    {% if request.user.is_authenticated %}
+        <div class = "username">{{ request.user.username }}</div>
+         <div class="button">
+               <a href="{% url 'logout' %}">Log out</a>
+         </div>
+
+    {% else %}
+        <div class="button">
+         <a href="{% url 'login' %}">Login</a><br>
+        </div>
+        <div class="button">
+         <a href="{% url 'signup' %}">Registration</a>
+        </div>
+    {% endif %}
+    </div>
+</div>
+
+<div class="content-wrap">
+    <div class="content">
+     {% block content %}{% endblock %}
+    </div>
+</div>
+
+</body>
+</html>

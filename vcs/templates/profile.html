@@ -1,0 +1,27 @@
+{% extends "vcs/base.html" %}
+
+{% block content %}
+
+<h1>Home page</h1>
+
+{% if request.user.is_authenticated %}
+
+        {% if repository_list %}
+        <ul>
+            {% for repo in repository_list %}
+                <li>
+                    <a href="{{ repo.slug }}">{{ repo.name }}</a>
+                </li>
+            {% endfor %}
+
+        </ul>
+    {% else %}
+        <p>There are no repositories.</p>
+    {% endif %}
+
+
+    <a href="{% url 'newrepo' %}">Create a repository</a><br>
+
+{% endif %}
+
+{% endblock %}
