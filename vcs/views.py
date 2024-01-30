@@ -36,7 +36,7 @@ def newRepo(request):
 
     else:
         form = NewRepoForm()
-    return render(request, 'newrepo.html', {'form': form})
+    return render(request, 'vcs/newrepo.html', {'form': form})
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -49,3 +49,5 @@ class RepositoryListView(LoginRequiredMixin, generic.ListView):
 
 class RepoDetailView(generic.DetailView):
     model = Repository
+    template_name = 'vcs/repo_detail.html'
+

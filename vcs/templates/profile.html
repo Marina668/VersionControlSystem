@@ -6,11 +6,12 @@
 
 {% if request.user.is_authenticated %}
 
+        <h3>Repositories: </h3>
         {% if repository_list %}
         <ul>
             {% for repo in repository_list %}
                 <li>
-                    <a href="{{ repo.slug }}">{{ repo.name }}</a>
+                    <a href="{% url 'repo-detail' repo.slug %}">{{ repo.name }}</a>
                 </li>
             {% endfor %}
 
