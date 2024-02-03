@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views import generic
+from django.http import HttpResponse
 
 from .models import Repository
 from .forms import NewRepoForm, NewFileForm, NewDirForm
@@ -39,7 +40,7 @@ def newRepo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
-def newDir(request):
+def newDir(request, slug):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
@@ -56,7 +57,7 @@ def newDir(request):
     return render(request, 'vcs/newdir.html', {'form': form})
 
 
-def newFile(request):
+def newFile(request, slug):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
@@ -64,6 +65,11 @@ def newFile(request):
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})
+
+
+def test_url(request, slug, path=''):
+    folders = path.split('/')
+    return HttpResponse('slug: ' + slug + ' path: ' + folders[0] + '/' + folders[1])
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -77,6 +83,14 @@ class RepositoryListView(LoginRequiredMixin, generic.ListView):
 class RepoDetailView(generic.DetailView):
     model = Repository
     template_name = 'vcs/repo_detail.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+        context["path"] = self.kwargs.get("path", '')
+
+        return context
 
 
 class UsersListView(LoginRequiredMixin, generic.ListView):

@@ -30,7 +30,7 @@ class Repository(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    slug = models.SlugField(default="", null=False)
+    slug = models.SlugField(default="", null=False, unique=True)
 
     def __str__(self):
         """
