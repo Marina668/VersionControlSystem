@@ -2,7 +2,27 @@
 
 {% block content %}
 
-<h2>{{ repository.name }}</h2>
+    <h2>{{ repository.name }}</h2>
 
+    <h3>Users who have access: </h3>
+
+    {% if users_list %}
+        <ul>
+            {% for user in users_list %}
+                <li>
+                    <a>{{ user.username }}</a>
+                </li>
+            {% endfor %}
+
+        </ul>
+    {% else %}
+        <p>There are no users who have access.</p>
+    {% endif %}
+
+
+
+    <a href="{% url 'newdir' %}">Create a directory</a><br>
+
+    <a href="{% url 'newfile' %}">Create a file</a><br>
 
 {% endblock %}

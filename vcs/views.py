@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import generic
 
 from .models import Repository
-from .forms import NewRepoForm
+from .forms import NewRepoForm, NewFileForm, NewDirForm
 import os
 from pathlib import Path
 
@@ -39,6 +39,33 @@ def newRepo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
+def newDir(request):
+    if request.method == 'POST':
+        form = NewDirForm(request.POST)
+        if form.is_valid():
+            path = Path(__file__).resolve().parent.parent.parent
+            # dir_path = path.joinpath('Repositories', Repository.objects.get(name=), form.cleaned_data['name'])
+            # try:
+            #     os.mkdir(dir_path.joinpath(form.cleaned_data['name']))
+            # except FileExistsError:
+            #     print("Directory with the same name already exists")
+
+            return redirect('profile')
+    else:
+        form = NewDirForm()
+    return render(request, 'vcs/newdir.html', {'form': form})
+
+
+def newFile(request):
+    if request.method == 'POST':
+        form = NewFileForm(request.POST)
+        if form.is_valid():
+            return redirect('profile')
+    else:
+        form = NewFileForm()
+    return render(request, 'vcs/newfile.html', {'form': form})
+
+
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
     model = Repository
     template_name = 'profile.html'
@@ -51,3 +78,7 @@ class RepoDetailView(generic.DetailView):
     model = Repository
     template_name = 'vcs/repo_detail.html'
 
+
+class UsersListView(LoginRequiredMixin, generic.ListView):
+    model = User
+    template_name = 'vcs/repo_detail.html'

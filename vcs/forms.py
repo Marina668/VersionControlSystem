@@ -2,6 +2,8 @@ from django import forms
 from django.contrib import auth
 from django.contrib.auth.models import User
 
+from pathlib import Path
+
 from vcs.models import Repository
 
 
@@ -11,3 +13,12 @@ class NewRepoForm(forms.ModelForm):
     class Meta:
         model = Repository
         fields = ['name']
+
+
+class NewFileForm(forms.Form):
+    name = forms.CharField(max_length=255)
+    content = forms.CharField(widget=forms.Textarea(attrs={"rows": "20"}))
+
+
+class NewDirForm(forms.Form):
+    name = forms.CharField(max_length=255)
