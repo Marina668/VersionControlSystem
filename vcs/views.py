@@ -48,13 +48,11 @@ def newDir(request, slug, path=''):
             general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
             dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content',
-                                             form.cleaned_data['name'])  # FIXME
+                                             form.cleaned_data['name'])  # FIXME Зараз тільки з пустим шляхом працює
             try:
                 os.mkdir(dir_path)
             except FileExistsError:
                 print("Directory with the same name already exists")
-
-            # return HttpResponse('path: ' + 'vcs')
 
             return redirect('repo-detail', slug=slug)
     else:
@@ -62,11 +60,23 @@ def newDir(request, slug, path=''):
     return render(request, 'vcs/newdir.html', {'form': form})
 
 
-def newFile(request, slug):
+def newFile(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
-            return redirect('profile')
+            folders = path.split('/')
+            general_path = Path(__file__).resolve().parent.parent.parent
+            content_path = Repository.objects.get(slug=slug).name
+            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content',
+                                             form.cleaned_data['name'])  # FIXME Зараз тільки з пустим шляхом працює
+            try:
+                f = open(str(dir_path) + '.txt', "w")
+                f.write(form.cleaned_data['content'])
+                f.close()
+            except FileExistsError:
+                print("File with the same name already exists")
+
+            return redirect('repo-detail', slug=slug)
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})
@@ -106,9 +116,9 @@ class RepoDetailView(generic.DetailView):
 
         general_path = Path(__file__).resolve().parent.parent.parent
         name = Repository.objects.get(slug=self.kwargs.get("slug")).name
-        # if '/newdir' not in self.kwargs.get("path", ''):
         context["list_of_dirs"] = os.listdir(
             general_path.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
+
         return context
 
 
