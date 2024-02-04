@@ -82,9 +82,9 @@ def newFile(request, slug, path=''):
     return render(request, 'vcs/newfile.html', {'form': form})
 
 
-def test_url(request, slug, path=''):
-    folders = path.split('/')
-    return HttpResponse('slug: ' + slug + ' path: ' + folders[0] + '/' + folders[1])
+# def test_url(request, slug, path=''):
+#     folders = path.split('/')
+#     return HttpResponse('slug: ' + slug + ' path: ' + folders[0] + '/' + folders[1])
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -112,12 +112,11 @@ class RepoDetailView(generic.DetailView):
         # Add in the publisher
         context["path"] = self.kwargs.get("path", '')
 
-        end = self.kwargs.get("path", '').split('/')[-1]
-
         general_path = Path(__file__).resolve().parent.parent.parent
         name = Repository.objects.get(slug=self.kwargs.get("slug")).name
-        context["list_of_dirs"] = os.listdir(
-            general_path.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
+
+        pth = Path(general_path.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
+        context['list_of_dirs'] = os.walk(pth)
 
         return context
 
