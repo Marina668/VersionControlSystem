@@ -20,11 +20,13 @@
     {#    {% endif %}#}
 
 
-    {{ path }}
+    {% for dir in list_of_dirs %}
+        <p> {{ dir }} <br></p>
+    {% endfor %}
 
 
 
-    <a href="{% url 'newdir' slug=repository.slug %}">Create a directory</a><br>
+    <a href="{% url 'newdir' slug=repository.slug path=path %}">Create a directory</a><br>
 
     <a href="{% url 'newfile' slug=repository.slug %}">Create a file</a><br>
 

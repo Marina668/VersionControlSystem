@@ -33,25 +33,30 @@ def newRepo(request):
             detail.author = request.user
             detail.save()
 
-            return redirect('profile')
+            return redirect('repo-detail', slug=detail.slug)
 
     else:
         form = NewRepoForm()
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
-def newDir(request, slug):
+def newDir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
-            path = Path(__file__).resolve().parent.parent.parent
-            # dir_path = path.joinpath('Repositories', Repository.objects.get(name=), form.cleaned_data['name'])
-            # try:
-            #     os.mkdir(dir_path.joinpath(form.cleaned_data['name']))
-            # except FileExistsError:
-            #     print("Directory with the same name already exists")
+            folders = path.split('/')
+            general_path = Path(__file__).resolve().parent.parent.parent
+            content_path = Repository.objects.get(slug=slug).name
+            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content',
+                                             form.cleaned_data['name'])  # FIXME
+            try:
+                os.mkdir(dir_path)
+            except FileExistsError:
+                print("Directory with the same name already exists")
 
-            return redirect('profile')
+            # return HttpResponse('path: ' + 'vcs')
+
+            return redirect('repo-detail', slug=slug)
     else:
         form = NewDirForm()
     return render(request, 'vcs/newdir.html', {'form': form})
@@ -76,6 +81,13 @@ class RepositoryListView(LoginRequiredMixin, generic.ListView):
     model = Repository
     template_name = 'profile.html'
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+        context["path"] = self.kwargs.get("path", '')
+        return context
+
     def get_queryset(self):
         return Repository.objects.filter(author=self.request.user)
 
@@ -90,6 +102,13 @@ class RepoDetailView(generic.DetailView):
         # Add in the publisher
         context["path"] = self.kwargs.get("path", '')
 
+        end = self.kwargs.get("path", '').split('/')[-1]
+
+        general_path = Path(__file__).resolve().parent.parent.parent
+        name = Repository.objects.get(slug=self.kwargs.get("slug")).name
+        # if '/newdir' not in self.kwargs.get("path", ''):
+        context["list_of_dirs"] = os.listdir(
+            general_path.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
         return context
 
 
