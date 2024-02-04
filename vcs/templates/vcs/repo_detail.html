@@ -19,27 +19,24 @@
     {#        <p>There are no users who have access.</p>#}
     {#    {% endif %}#}
 
-    <p>path: {{ path }}</p>
 
+    {% for dir in dirlist %}
+        {#            <a href="{% url 'repo-detail' slug=repository.slug path='/'|add:path|add:dir|urlencode %}">{{ dir }}</a><br>#}
 
+        {#            <a href="/{{repository.slug|add:'/'|add:path|add:dir|urlencode|add:'/' }}">{{ dir }}<br></a>#}
 
-    {% for root, dirs, files in list_of_dirs %}
-        {% for dir in dirs %}
-{#            <a href="{% url 'repo-detail' slug=repository.slug|add:"/" path=path|add:dir|urlencode %}">{{ dir }}<br></a>#}
-            <a href="{{repository.slug|add:'/'|add:path|add:dir|urlencode }}">{{ dir }}<br></a>
-            {#            <p> {{ dir }} <br></p>#}
-        {% endfor %}
+        <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a><br>
+    {% endfor %}
 
-        {% for file in files %}
-            <p> {{ file }} <br></p>
-        {% endfor %}
+    {% for file in filelist %}
+        <p> {{ file }} </p>
     {% endfor %}
 
 
 
 
-    <a href="{% url 'newdir' slug=repository.slug path=path %}">Create a directory</a><br>
+    <a href="{{ request.path|add:'newdir/' }}"><br>Create a directory</a><br>
 
-    <a href="{% url 'newfile' slug=repository.slug path=path %}">Create a file</a><br>
+    <a href="{{ request.path|add:'newfile/' }}">Create a file</a><br>
 
 {% endblock %}
