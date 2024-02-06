@@ -44,10 +44,13 @@ def newDir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
-            folders = path.split('/')
-            curr_path = ''
-            for i in range(len(folders)):
-                curr_path += '/' +folders[i]
+            if path is not '':
+                folders = path.split('/')
+                curr_path = ''
+                for i in range(len(folders)-1):
+                    curr_path += '/' + folders[i]
+            else:
+                curr_path = ''
 
             general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
@@ -59,6 +62,9 @@ def newDir(request, slug, path=''):
                 print("Directory with the same name already exists")
 
             return redirect('repo-detail', slug=slug, path=curr_path + form.cleaned_data['name'])
+
+            # return HttpResponse('slug: ' + slug + ' path: ' + curr_path + '/' + form.cleaned_data['name'])
+
     else:
         form = NewDirForm()
     return render(request, 'vcs/newdir.html', {'form': form})
@@ -68,23 +74,28 @@ def newFile(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
-            folders = path.split('/')
-            curr_path = ''
-            for i in range(len(folders)):
-                curr_path += folders[i] + '/'
+            if path is not '':
+                folders = path.split('/')
+                curr_path = ''
+                for i in range(len(folders)-1):
+                    curr_path += '/' + folders[i]
+            else:
+                curr_path = ''
 
             general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
             dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
                                              form.cleaned_data['name'])
             try:
-                f = open(str(dir_path) + '.txt', "w")
+                f = open(str(dir_path), "w")
                 f.write(form.cleaned_data['content'])
                 f.close()
             except FileExistsError:
                 print("File with the same name already exists")
 
-            return redirect('repo-detail', slug=slug, path=curr_path + form.cleaned_data['name'])
+            return redirect('repo-detail', slug=slug, path=curr_path)
+
+            # return HttpResponse('slug: ' + slug + ' path: ' + curr_path)
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})

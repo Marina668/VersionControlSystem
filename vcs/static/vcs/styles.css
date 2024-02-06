@@ -45,6 +45,10 @@ body {
     font-size: 12px;
 }
 
+.content-wrap {
+    width: 100%;
+}
+
 .content {
      margin: 0 auto;
      width: max-content;
@@ -66,4 +70,81 @@ input {
     padding: 5px;
     border: 1px solid #cccccc;
     border-radius: 5px;
+}
+
+textarea {
+    width: 600px;
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+
+form.filedata {
+    margin: 30px;
+}
+
+.filedata textarea {
+    width: 600px;
+    color: #ae541d;
+}
+
+.filedata input {
+    width: 600px;
+}
+
+button {
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.buttonSubmit button {
+    margin: 0 auto;
+    font-weight: bold;
+    width: 100px;
+    height: 25px;
+}
+
+h1 {
+    font-size: 24px;
+    text-align: center;
+    color: #1F6351;
+}
+
+h3 {
+    text-align: center;
+}
+
+.top-buttons-block {
+    width: 100%;
+    display: inline-flex;
+    justify-content: flex-end;
+    border-bottom: 1px solid #cccccc;
+    padding: 5px 0;
+}
+
+.top-buttons-block .button {
+    margin-left: 5px;
+}
+
+.row-list {
+    height: 50px;
+    border-bottom: 1px solid #cccccc;
+    display: flex;
+    align-items: center;
+    min-width: 400px;
+    padding: 0 10px;
+}
+
+.row-list:hover {
+    background-color: #f2f2f2;
+}
+
+.row-list a {
+    text-decoration: none;
+}
+
+.row-list a:hover {
+    text-decoration: underline;
 }

@@ -1,8 +1,17 @@
 {% extends "vcs/base.html" %}
 
+{% block top-buttons %}
+    <div class="button">
+        <a href="{{ request.path|add:'newdir/' }}">Create a directory</a>
+    </div>
+    <div class="button">
+        <a href="{{ request.path|add:'newfile/' }}">Create a file</a>
+    </div>
+{% endblock %}
+
 {% block content %}
 
-    <h2>{{ repository.name }}</h2>
+    <h1>{{ repository.name }}</h1>
 
     {#    <h3>Users who have access: </h3>#}
     {##}
@@ -25,18 +34,17 @@
 
         {#            <a href="/{{repository.slug|add:'/'|add:path|add:dir|urlencode|add:'/' }}">{{ dir }}<br></a>#}
 
-        <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a><br>
+
+        <div class="row-list">
+             <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a>
+        </div>
     {% endfor %}
 
     {% for file in filelist %}
-        <p> {{ file }} </p>
+        <div class="row-list">
+        {{ file }}
+        </div>
     {% endfor %}
 
-
-
-
-    <a href="{{ request.path|add:'newdir/' }}"><br>Create a directory</a><br>
-
-    <a href="{{ request.path|add:'newfile/' }}">Create a file</a><br>
 
 {% endblock %}

@@ -1,27 +1,29 @@
 {% extends "vcs/base.html" %}
 
-{% block content %}
+{% block top-buttons %}
+    <div class="button">
+        <a href="{% url 'newrepo' %}">Create a repository</a>
+    </div>
+{% endblock %}
 
-<h1>Home page</h1>
+{% block content %}
 
 {% if request.user.is_authenticated %}
 
-        <h3>My Repositories: </h3>
+        <h1>My Repositories: </h1>
         {% if repository_list %}
-        <ul>
             {% for repo in repository_list %}
-                <li>
+                <div class="row-list">
                     <a href="{% url 'repo-detail' slug=repo.slug path=path %}">{{ repo.name }}</a>
-                </li>
+                </div>
             {% endfor %}
 
-        </ul>
     {% else %}
         <p>There are no repositories.</p>
     {% endif %}
 
 
-    <a href="{% url 'newrepo' %}">Create a repository</a><br>
+
 
 {% endif %}
 

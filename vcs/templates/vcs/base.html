@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'vcs/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'vcs/styles.css' %}?{% now "U" %}"/>
     <title>{% block title %}TinyVCS{% endblock %}</title>
 </head>
 <body>
@@ -29,6 +29,9 @@
 </div>
 
 <div class="content-wrap">
+    <div class="top-buttons-block">
+       {% block top-buttons %}{% endblock %}
+    </div>
     <div class="content">
      {% block content %}{% endblock %}
     </div>
