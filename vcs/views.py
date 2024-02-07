@@ -44,14 +44,6 @@ def newDir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
-            if path is not '':
-                folders = path.split('/')
-                curr_path = ''
-                for i in range(len(folders)-1):
-                    curr_path += '/' + folders[i]
-            else:
-                curr_path = ''
-
             general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
             dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
@@ -61,7 +53,7 @@ def newDir(request, slug, path=''):
             except FileExistsError:
                 print("Directory with the same name already exists")
 
-            return redirect('repo-detail', slug=slug, path=curr_path + form.cleaned_data['name'])
+            return redirect('repo-detail', slug=slug, path=path + form.cleaned_data['name'])
 
             # return HttpResponse('slug: ' + slug + ' path: ' + curr_path + '/' + form.cleaned_data['name'])
 
@@ -74,14 +66,6 @@ def newFile(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
-            if path is not '':
-                folders = path.split('/')
-                curr_path = ''
-                for i in range(len(folders)-1):
-                    curr_path += '/' + folders[i]
-            else:
-                curr_path = ''
-
             general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
             dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
@@ -93,12 +77,69 @@ def newFile(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
-            return redirect('repo-detail', slug=slug, path=curr_path)
+            return redirect('repo-detail', slug=slug, path=path)
 
             # return HttpResponse('slug: ' + slug + ' path: ' + curr_path)
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})
+
+
+def readFile(request, slug, path='', fname=''):
+    general_path = Path(__file__).resolve().parent.parent.parent
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+
+    f = open(str(dir_path), "r")
+    file_content = f.read()
+    f.close()
+
+    context = {
+        'file_name': fname,
+        'file_text': file_content
+    }
+
+    return render(request, 'vcs/readfile.html', context=context)
+
+
+def editFile(request, slug, path='', fname=''):
+    general_path = Path(__file__).resolve().parent.parent.parent
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+
+    f = open(str(dir_path), "r")
+    file_content = f.read()
+    f.close()
+
+    if request.method == 'POST':
+        form = NewFileForm(request.POST)
+        if form.is_valid():
+            if fname == form.cleaned_data['name']:
+                if file_content == form.cleaned_data['content']:
+                    return redirect('readfile', slug=slug, path=path, fname=fname)
+                else:
+                    f = open(str(dir_path), "w")
+                    f.write(form.cleaned_data['content'])
+                    f.close()
+            else:
+                os.remove(dir_path)
+                new_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
+                                                 form.cleaned_data['name'])
+                f = open(str(new_path), "w")
+                f.write(form.cleaned_data['content'])
+                f.close()
+                return redirect('readfile', slug=slug, path=path, fname=form.cleaned_data['name'])
+
+            return redirect('readfile', slug=slug, path=path, fname=fname)
+
+    else:
+        form = NewFileForm(initial={'name': fname, 'content': file_content})
+
+    return render(request, 'vcs/editfile.html', {'form': form})
+
+
+def delete(request, slug, path='', fname=''):
+    return HttpResponse('slug: ' + slug + ' path: ' + path + 'fname: ' + fname)
 
 
 # def test_url(request, slug, path=''):

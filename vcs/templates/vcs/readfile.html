@@ -1,0 +1,18 @@
+{% extends "vcs/base.html" %}
+
+{% block top-buttons %}
+    <div class="button">
+        <a href="{{ request.path|add:'edit/' }}">Edit this file</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ file_name }}</h1>
+<form method="POST" class="filedata">
+    {% csrf_token %}
+    {{ file_text }}
+</form>
+
+
+{% endblock %}

@@ -16,9 +16,10 @@ class NewRepoForm(forms.ModelForm):
 
 
 class NewFileForm(forms.Form):
-    name = forms.CharField(max_length=255)
-    content = forms.CharField(widget=forms.Textarea(attrs={"rows": "20"}))
+    name = forms.CharField(max_length=255, initial='')
+    content = forms.CharField(widget=forms.Textarea(attrs={"rows": "20"}), initial='')
 
 
 class NewDirForm(forms.Form):
     name = forms.CharField(max_length=255)
+

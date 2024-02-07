@@ -30,19 +30,25 @@
 
 
     {% for dir in dirlist %}
-        {#            <a href="{% url 'repo-detail' slug=repository.slug path='/'|add:path|add:dir|urlencode %}">{{ dir }}</a><br>#}
-
+        {#                    <a href="{% url 'repo-detail' slug=repository.slug path='/'|add:path|add:dir|urlencode %}">{{ dir }}</a><br>#}
         {#            <a href="/{{repository.slug|add:'/'|add:path|add:dir|urlencode|add:'/' }}">{{ dir }}<br></a>#}
 
 
         <div class="row-list">
-             <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a>
+            <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a>
+{#            <div class="button">#}
+{#                <a href="{{ request.path|add:dir|urlencode|add:'/'|add:'delete/' }}">Delete</a>#}
+{#            </div>#}
         </div>
     {% endfor %}
 
     {% for file in filelist %}
         <div class="row-list">
-        {{ file }}
+            {#        {{ file }}#}
+            <a href="{{ request.path|add:file|urlencode|add:'/' }}">{{ file }}</a>
+{#            <div class="button">#}
+{#            <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>#}
+{#            </div>#}
         </div>
     {% endfor %}
 
