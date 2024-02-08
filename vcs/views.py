@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from .models import Repository
 from .forms import NewRepoForm, NewFileForm, NewDirForm
 import os
+import shutil
 from pathlib import Path
 
 
@@ -138,13 +139,33 @@ def editFile(request, slug, path='', fname=''):
     return render(request, 'vcs/editfile.html', {'form': form})
 
 
-def delete(request, slug, path='', fname=''):
-    return HttpResponse('slug: ' + slug + ' path: ' + path + 'fname: ' + fname)
+def delete(request, slug, path=''):
+    general_path = Path(__file__).resolve().parent.parent.parent
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path)
 
+    new_path = ''
+    folders = path.split('/')
+    for i in range(len(folders)-2):
+        new_path = '/' + folders[i]
 
-# def test_url(request, slug, path=''):
-#     folders = path.split('/')
-#     return HttpResponse('slug: ' + slug + ' path: ' + folders[0] + '/' + folders[1])
+    if request.method == 'POST':
+
+        if os.path.isfile(dir_path):
+            os.remove(dir_path)
+        else:
+            shutil.rmtree(dir_path)
+
+        return redirect('repo-detail', slug=slug, path=new_path)
+        # return HttpResponse('slug: ' + slug + ' path: ' + path + 'new_path: ' + new_path)
+
+    context = {
+        'item_name': folders[-2],
+        'slug': slug,
+        'path': new_path,
+    }
+
+    return render(request, 'vcs/delete_item.html', context)
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):

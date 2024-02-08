@@ -136,6 +136,7 @@ h3 {
     align-items: center;
     min-width: 400px;
     padding: 0 10px;
+    justify-content: space-between;
 }
 
 .row-list:hover {

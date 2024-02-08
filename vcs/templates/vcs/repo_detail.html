@@ -36,19 +36,18 @@
 
         <div class="row-list">
             <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a>
-{#            <div class="button">#}
-{#                <a href="{{ request.path|add:dir|urlencode|add:'/'|add:'delete/' }}">Delete</a>#}
-{#            </div>#}
+            <div class="button">
+                <a href="{{ request.path|add:dir|urlencode|add:'/'|add:'delete/' }}">Delete</a>
+            </div>
         </div>
     {% endfor %}
 
     {% for file in filelist %}
         <div class="row-list">
-            {#        {{ file }}#}
             <a href="{{ request.path|add:file|urlencode|add:'/' }}">{{ file }}</a>
-{#            <div class="button">#}
-{#            <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>#}
-{#            </div>#}
+            <div class="button">
+            <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>
+            </div>
         </div>
     {% endfor %}
 

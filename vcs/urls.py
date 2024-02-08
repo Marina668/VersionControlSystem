@@ -8,7 +8,7 @@ urlpatterns = [
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?\/?newdir/$', views.newDir, name='newdir'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?\/?newfile/$', views.newFile, name='newfile'),
 
-    #re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?\/?delete/$', views.delete, name='delete'),
+    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?\/?delete/$', views.delete, name='delete'),
 
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/$', views.RepoDetailView.as_view(), name='repo-detail'),
 
