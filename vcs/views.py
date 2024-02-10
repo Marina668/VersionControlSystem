@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.http import HttpResponse
 
 from .models import Repository
-from .forms import NewRepoForm, NewFileForm, NewDirForm
+from .forms import *
 import os
 import shutil
 from pathlib import Path
@@ -78,12 +79,36 @@ def newFile(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
+            if path != '':
+                path = '/' + path[:-1]
             return redirect('repo-detail', slug=slug, path=path)
 
-            # return HttpResponse('slug: ' + slug + ' path: ' + curr_path)
+            # return HttpResponse('slug: ' + slug + ' path: ' + path)
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})
+
+
+def uploadFile(request, slug, path=''):
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            general_path = Path(__file__).resolve().parent.parent.parent
+            content_path = Repository.objects.get(slug=slug).name
+            filename = request.FILES["file"].name
+            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, filename)
+
+            with open(str(dir_path), "wb+") as destination:
+                for chunk in request.FILES["file"].chunks():
+                    destination.write(chunk)
+
+            if path != '':
+                path = '/' + path[:-1]
+            return redirect('repo-detail', slug=slug, path=path)
+            # return HttpResponse('dirpath: ' + path)
+    else:
+        form = UploadFileForm()
+    return render(request, "vcs/uploadfile.html", {"form": form})
 
 
 def readFile(request, slug, path='', fname=''):

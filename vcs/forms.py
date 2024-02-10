@@ -23,3 +23,7 @@ class NewFileForm(forms.Form):
 class NewDirForm(forms.Form):
     name = forms.CharField(max_length=255)
 
+
+class UploadFileForm(forms.Form):
+    file = forms.FileField()
+

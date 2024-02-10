@@ -7,6 +7,9 @@
     <div class="button">
         <a href="{{ request.path|add:'newfile/' }}">Create a file</a>
     </div>
+    <div class="button">
+        <a href="{{ request.path|add:'uploadfile/' }}">Upload a file</a>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +49,7 @@
         <div class="row-list">
             <a href="{{ request.path|add:file|urlencode|add:'/' }}">{{ file }}</a>
             <div class="button">
-            <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>
+                <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>
             </div>
         </div>
     {% endfor %}
