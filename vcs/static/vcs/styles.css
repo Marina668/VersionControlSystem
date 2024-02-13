@@ -123,11 +123,13 @@ h3 {
     justify-content: flex-end;
     border-bottom: 1px solid #cccccc;
     padding: 5px 0;
+    min-height: 25px;
 }
 
 .top-buttons-block .button {
     margin-left: 5px;
 }
+
 
 .row-list {
     height: 50px;
@@ -149,4 +151,22 @@ h3 {
 
 .row-list a:hover {
     text-decoration: underline;
+}
+
+.are-you-sure {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: red;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.confirm-buttons {
+    text-align: center;
+}
+.confirm-buttons button {
+    width: 70px;
+    margin: 0 10px;
+    padding: 5px;
 }

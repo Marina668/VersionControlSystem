@@ -12,6 +12,9 @@ import shutil
 from pathlib import Path
 
 
+PATH = Path(__file__).resolve().parent.parent.parent
+
+
 def profileView(request):
     if request.user.is_authenticated:
         return redirect('repositories')
@@ -23,11 +26,10 @@ def newRepo(request):
     if request.method == 'POST':
         form = NewRepoForm(request.POST)
         if form.is_valid():
-            path = Path(__file__).resolve().parent.parent.parent
-            repositories_path = path.joinpath('Repositories', form.cleaned_data['name'], 'Content')
+            repositories_path = PATH.joinpath('Repositories', form.cleaned_data['name'], 'Content')
             try:
                 os.makedirs(repositories_path)
-                os.mkdir(path.joinpath('Repositories', form.cleaned_data['name'], 'History'))
+                os.mkdir(PATH.joinpath('Repositories', form.cleaned_data['name'], 'History'))
             except FileExistsError:
                 print("Repository with the same name already exists")
 
@@ -46,9 +48,8 @@ def newDir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
-            general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
-            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
+            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
                                              form.cleaned_data['name'])
             try:
                 os.mkdir(dir_path)
@@ -68,9 +69,8 @@ def newFile(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
-            general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
-            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
+            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
                                              form.cleaned_data['name'])
             try:
                 f = open(str(dir_path), "w")
@@ -93,10 +93,9 @@ def uploadFile(request, slug, path=''):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            general_path = Path(__file__).resolve().parent.parent.parent
             content_path = Repository.objects.get(slug=slug).name
             filename = request.FILES["file"].name
-            dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, filename)
+            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, filename)
 
             with open(str(dir_path), "wb+") as destination:
                 for chunk in request.FILES["file"].chunks():
@@ -112,9 +111,8 @@ def uploadFile(request, slug, path=''):
 
 
 def readFile(request, slug, path='', fname=''):
-    general_path = Path(__file__).resolve().parent.parent.parent
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, fname)
 
     f = open(str(dir_path), "r")
     file_content = f.read()
@@ -129,9 +127,8 @@ def readFile(request, slug, path='', fname=''):
 
 
 def editFile(request, slug, path='', fname=''):
-    general_path = Path(__file__).resolve().parent.parent.parent
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, fname)
 
     f = open(str(dir_path), "r")
     file_content = f.read()
@@ -149,7 +146,7 @@ def editFile(request, slug, path='', fname=''):
                     f.close()
             else:
                 os.remove(dir_path)
-                new_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path,
+                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
                                                  form.cleaned_data['name'])
                 f = open(str(new_path), "w")
                 f.write(form.cleaned_data['content'])
@@ -165,9 +162,8 @@ def editFile(request, slug, path='', fname=''):
 
 
 def delete(request, slug, path=''):
-    general_path = Path(__file__).resolve().parent.parent.parent
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = general_path.joinpath('Repositories', Path(content_path), 'Content', path)
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
     new_path = ''
     folders = path.split('/')
@@ -218,16 +214,17 @@ class RepoDetailView(generic.DetailView):
         # Add in the publisher
         context["path"] = self.kwargs.get("path", '')
 
-        general_path = Path(__file__).resolve().parent.parent.parent
         name = Repository.objects.get(slug=self.kwargs.get("slug")).name
 
-        pth = Path(general_path.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
+        pth = Path(PATH.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
         # context['list_of_dirs'] = os.walk(pth)
 
         # List of directories only
         context['dirlist'] = [x for x in os.listdir(pth) if os.path.isdir(os.path.join(pth, x))]
         # List of files only
         context['filelist'] = [x for x in os.listdir(pth) if not os.path.isdir(os.path.join(pth, x))]
+
+        context['len_list'] = len(context['dirlist']) + len(context['filelist'])
 
         return context
 

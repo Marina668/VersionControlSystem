@@ -31,6 +31,9 @@
     {#        <p>There are no users who have access.</p>#}
     {#    {% endif %}#}
 
+    {% if len_list == 0 %}
+        <p> Nothing is here</p>
+    {% endif %}
 
     {% for dir in dirlist %}
         {#                    <a href="{% url 'repo-detail' slug=repository.slug path='/'|add:path|add:dir|urlencode %}">{{ dir }}</a><br>#}

@@ -8,11 +8,11 @@
 
 {% block content %}
 
-<h1>{{ file_name }}</h1>
-<form method="POST" class="filedata">
-    {% csrf_token %}
-    {{ file_text }}
-</form>
+    <h1>{{ file_name }}</h1>
+    <form method="POST" class="filedata">
+        {% csrf_token %}
+        {{ file_text }}
+    </form>
 
 
 {% endblock %}
