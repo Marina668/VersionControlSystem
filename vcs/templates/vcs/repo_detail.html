@@ -1,6 +1,12 @@
 {% extends "vcs/base.html" %}
 
 {% block top-buttons %}
+
+{#    {% for part in path_parts %}#}
+{#        <a href="{{ current_path }}">{{ part }}</a> /#}
+{#    {% endfor %}#}
+
+
     <div class="button">
         <a href="{{ request.path|add:'newdir/' }}">Create a directory</a>
     </div>
@@ -32,7 +38,9 @@
     {#    {% endif %}#}
 
     {% if len_list == 0 %}
-        <p> Nothing is here</p>
+        <div class="light">
+            <p> Nothing is here</p>
+        </div>
     {% endif %}
 
     {% for dir in dirlist %}

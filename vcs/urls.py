@@ -10,12 +10,13 @@ urlpatterns = [
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?\/?uploadfile/$', views.uploadFile, name='uploadfile'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?\/?delete/$', views.delete, name='delete'),
 
-    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/$', views.RepoDetailView.as_view(), name='repo-detail'),
+    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?/edit/$', views.editFile, name='editfile'),
 
-    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/(?P<fname>[- %.\w\/]+)?/edit/$', views.editFile,
-            name='editfile'),
-    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/(?P<fname>[- %.\w\/]+)?/$', views.readFile, name='readfile'),
-    #re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?/$', views.readFile, name='readfile'),
+     # re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/$', views.RepoDetailView.as_view(), name='repo-detail'),
+    re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?/$', views.FileOrDirView, name='file-or-dir-view'),
 
+
+    # re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/(?P<fname>[- %.\w\/]+)?/$', views.readFile, name='readfile'),
+    # re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?/$', views.readFile, name='readfile'),
 
 ]

@@ -8,23 +8,26 @@
 
 {% block content %}
 
-{% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated %}
 
         <h1>My Repositories: </h1>
         {% if repository_list %}
             {% for repo in repository_list %}
                 <div class="row-list">
-                    <a href="{% url 'repo-detail' slug=repo.slug path=path %}">{{ repo.name }}</a>
+                    <a href="{% url 'file-or-dir-view' slug=repo.slug path=path %}">{{ repo.name }}</a>
                 </div>
             {% endfor %}
 
-    {% else %}
-        <p>There are no repositories.</p>
+        {% else %}
+            <div class="light">
+                <p>There are no repositories.</p>
+            </div>
+
+        {% endif %}
+
+
+
+
     {% endif %}
-
-
-
-
-{% endif %}
 
 {% endblock %}

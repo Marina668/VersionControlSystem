@@ -11,7 +11,6 @@ import os
 import shutil
 from pathlib import Path
 
-
 PATH = Path(__file__).resolve().parent.parent.parent
 
 
@@ -50,15 +49,15 @@ def newDir(request, slug, path=''):
         if form.is_valid():
             content_path = Repository.objects.get(slug=slug).name
             dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
-                                             form.cleaned_data['name'])
+                                     form.cleaned_data['name'])
             try:
                 os.mkdir(dir_path)
             except FileExistsError:
                 print("Directory with the same name already exists")
 
-            return redirect('repo-detail', slug=slug, path=path + form.cleaned_data['name'])
+            return redirect('file-or-dir-view', slug=slug, path='/' + path + form.cleaned_data['name'])
 
-            # return HttpResponse('slug: ' + slug + ' path: ' + curr_path + '/' + form.cleaned_data['name'])
+            # return HttpResponse('slug: ' + slug + ' path: ' + path)
 
     else:
         form = NewDirForm()
@@ -71,7 +70,7 @@ def newFile(request, slug, path=''):
         if form.is_valid():
             content_path = Repository.objects.get(slug=slug).name
             dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
-                                             form.cleaned_data['name'])
+                                     form.cleaned_data['name'])
             try:
                 f = open(str(dir_path), "w")
                 f.write(form.cleaned_data['content'])
@@ -79,9 +78,7 @@ def newFile(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
-            if path != '':
-                path = '/' + path[:-1]
-            return redirect('repo-detail', slug=slug, path=path)
+            return redirect('file-or-dir-view', slug=slug, path='/' + path + form.cleaned_data['name'])
 
             # return HttpResponse('slug: ' + slug + ' path: ' + path)
     else:
@@ -103,20 +100,23 @@ def uploadFile(request, slug, path=''):
 
             if path != '':
                 path = '/' + path[:-1]
-            return redirect('repo-detail', slug=slug, path=path)
+            return redirect('file-or-dir-view', slug=slug, path=path + '/' + filename)
             # return HttpResponse('dirpath: ' + path)
     else:
         form = UploadFileForm()
     return render(request, "vcs/uploadfile.html", {"form": form})
 
 
-def readFile(request, slug, path='', fname=''):
+def readFile(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
     f = open(str(dir_path), "r")
     file_content = f.read()
     f.close()
+
+    path_parts = path.split('/')
+    fname = path_parts[-1]
 
     context = {
         'file_name': fname,
@@ -126,34 +126,40 @@ def readFile(request, slug, path='', fname=''):
     return render(request, 'vcs/readfile.html', context=context)
 
 
-def editFile(request, slug, path='', fname=''):
+def editFile(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, fname)
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
     f = open(str(dir_path), "r")
     file_content = f.read()
     f.close()
+
+    path_parts = path.split('/')
+    fname = path_parts[-1]
 
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
             if fname == form.cleaned_data['name']:
                 if file_content == form.cleaned_data['content']:
-                    return redirect('readfile', slug=slug, path=path, fname=fname)
+                    return redirect('file-or-dir-view', slug=slug, path='/' + path)
                 else:
                     f = open(str(dir_path), "w")
                     f.write(form.cleaned_data['content'])
                     f.close()
             else:
                 os.remove(dir_path)
-                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
-                                                 form.cleaned_data['name'])
+                pth = ''
+                for i in range(len(path_parts) - 1):
+                    pth += path_parts[i] + '/'
+                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', pth[:-1],
+                                         form.cleaned_data['name'])
                 f = open(str(new_path), "w")
                 f.write(form.cleaned_data['content'])
                 f.close()
-                return redirect('readfile', slug=slug, path=path, fname=form.cleaned_data['name'])
+                return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
 
-            return redirect('readfile', slug=slug, path=path, fname=fname)
+            return redirect('file-or-dir-view', slug=slug, path='/' + path)
 
     else:
         form = NewFileForm(initial={'name': fname, 'content': file_content})
@@ -167,18 +173,17 @@ def delete(request, slug, path=''):
 
     new_path = ''
     folders = path.split('/')
-    for i in range(len(folders)-2):
-        new_path = '/' + folders[i]
+    for i in range(len(folders) - 2):
+        new_path += '/' + folders[i]
 
     if request.method == 'POST':
-
         if os.path.isfile(dir_path):
             os.remove(dir_path)
         else:
             shutil.rmtree(dir_path)
 
-        return redirect('repo-detail', slug=slug, path=new_path)
-        # return HttpResponse('slug: ' + slug + ' path: ' + path + 'new_path: ' + new_path)
+        return redirect('file-or-dir-view', slug=slug, path=new_path)
+        #return HttpResponse('slug: ' + slug + ' path: ' + path + 'new_path: ' + new_path)
 
     context = {
         'item_name': folders[-2],
@@ -187,6 +192,18 @@ def delete(request, slug, path=''):
     }
 
     return render(request, 'vcs/delete_item.html', context)
+
+
+def FileOrDirView(request, slug, path=''):
+    if path != '' and path[-1] == '/':
+        path = path[:-1]
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+    if os.path.isfile(dir_path):
+        return readFile(request, slug=slug, path=path)
+
+    elif os.path.isdir(dir_path):
+        return RepoDetailView.as_view()(request, slug=slug, path=path)
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -212,7 +229,7 @@ class RepoDetailView(generic.DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in the publisher
-        context["path"] = self.kwargs.get("path", '')
+        #context["path"] = self.kwargs.get("path", '')
 
         name = Repository.objects.get(slug=self.kwargs.get("slug")).name
 
@@ -225,6 +242,10 @@ class RepoDetailView(generic.DetailView):
         context['filelist'] = [x for x in os.listdir(pth) if not os.path.isdir(os.path.join(pth, x))]
 
         context['len_list'] = len(context['dirlist']) + len(context['filelist'])
+
+        # context['path_parts'] = context['path'].split('/')
+        #
+        # context['current_path'] = ''
 
         return context
 
