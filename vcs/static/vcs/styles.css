@@ -117,17 +117,33 @@ h3 {
     text-align: center;
 }
 
-.light {
-    color: #D4d4d4
+.nothing {
+    color: #D4d4d4;
+    font-size: 20px;
+    margin-top: 50px;
+}
+
+.top-block {
+    width: 100%;
+    border-bottom: 1px solid #cccccc;
+    min-height: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.breadcrumbs-block {
+    display: inline-flex;
+    justify-content: start;
+    align-items: center;
+    text-align: left;
+    vertical-align: middle;
+    margin-left: 10px;
 }
 
 .top-buttons-block {
-    width: 100%;
     display: inline-flex;
-    justify-content: flex-end;
-    border-bottom: 1px solid #cccccc;
+    justify-content: end;
     padding: 5px 0;
-    min-height: 25px;
 }
 
 .top-buttons-block .button {

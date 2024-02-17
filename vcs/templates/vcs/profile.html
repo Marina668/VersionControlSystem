@@ -1,8 +1,11 @@
 {% extends "vcs/base.html" %}
 
+{#{% block breadcrumbs %}#}
+{#{% endblock %}#}
+
 {% block top-buttons %}
     <div class="button">
-        <a href="{% url 'newrepo' %}">Create a repository</a>
+        <a href="{{ request.path|add:'newrepo' }}">Create a repository</a>
     </div>
 {% endblock %}
 
@@ -14,12 +17,12 @@
         {% if repository_list %}
             {% for repo in repository_list %}
                 <div class="row-list">
-                    <a href="{% url 'file-or-dir-view' slug=repo.slug path=path %}">{{ repo.name }}</a>
+                    <a href="{{ repo.slug }}">{{ repo.name }}</a>
                 </div>
             {% endfor %}
 
         {% else %}
-            <div class="light">
+            <div class="nothing">
                 <p>There are no repositories.</p>
             </div>
 

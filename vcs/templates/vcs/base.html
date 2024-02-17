@@ -8,32 +8,38 @@
 </head>
 <body>
 <div class="header">
-    <img src="{% static 'vcs/logo.png' %}"/>
+    <a href="{% url 'profile' %}"><img src="{% static 'vcs/logo.png' %}"/></a>
 
     <div class="auth-buttons-block">
-    {% if request.user.is_authenticated %}
-        <div class = "username">{{ request.user.username }}</div>
-         <div class="button">
-               <a href="{% url 'logout' %}">Log out</a>
-         </div>
+        {% if request.user.is_authenticated %}
+            <div class="username">{{ request.user.username }}</div>
+            <div class="button">
+                <a href="{% url 'logout' %}">Log out</a>
+            </div>
 
-    {% else %}
-        <div class="button">
-         <a href="{% url 'login' %}">Login</a><br>
-        </div>
-        <div class="button">
-         <a href="{% url 'signup' %}">Registration</a>
-        </div>
-    {% endif %}
+        {% else %}
+            <div class="button">
+                <a href="{% url 'login' %}">Login</a><br>
+            </div>
+            <div class="button">
+                <a href="{% url 'signup' %}">Registration</a>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <div class="content-wrap">
-    <div class="top-buttons-block">
-       {% block top-buttons %}{% endblock %}
+    <div class="top-block">
+        <div class="breadcrumbs-block">
+            {% block breadcrumbs %}{% endblock %}
+        </div>
+        <div class="top-buttons-block">
+            {% block top-buttons %}{% endblock %}
+        </div>
     </div>
+
     <div class="content">
-     {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
     </div>
 </div>
 

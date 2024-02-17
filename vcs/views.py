@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import generic
 from django.http import HttpResponse
 
@@ -14,14 +15,14 @@ from pathlib import Path
 PATH = Path(__file__).resolve().parent.parent.parent
 
 
-def profileView(request):
+def profile_view(request):
     if request.user.is_authenticated:
-        return redirect('repositories')
+        return RepositoryListView.as_view()(request)
     else:
         return redirect('login')
 
 
-def newRepo(request):
+def new_repo(request):
     if request.method == 'POST':
         form = NewRepoForm(request.POST)
         if form.is_valid():
@@ -43,7 +44,7 @@ def newRepo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
-def newDir(request, slug, path=''):
+def new_dir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
@@ -55,16 +56,17 @@ def newDir(request, slug, path=''):
             except FileExistsError:
                 print("Directory with the same name already exists")
 
-            return redirect('file-or-dir-view', slug=slug, path='/' + path + form.cleaned_data['name'])
-
-            # return HttpResponse('slug: ' + slug + ' path: ' + path)
+            if path != '':
+                return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
+            else:
+                return redirect('file-or-dir-view', slug=slug, path='/' + form.cleaned_data['name'])
 
     else:
         form = NewDirForm()
     return render(request, 'vcs/newdir.html', {'form': form})
 
 
-def newFile(request, slug, path=''):
+def new_file(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
@@ -78,15 +80,17 @@ def newFile(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
-            return redirect('file-or-dir-view', slug=slug, path='/' + path + form.cleaned_data['name'])
+            if path != '':
+                return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
+            else:
+                return redirect('file-or-dir-view', slug=slug, path='/' + form.cleaned_data['name'])
 
-            # return HttpResponse('slug: ' + slug + ' path: ' + path)
     else:
         form = NewFileForm()
     return render(request, 'vcs/newfile.html', {'form': form})
 
 
-def uploadFile(request, slug, path=''):
+def upload_file(request, slug, path=''):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -98,16 +102,17 @@ def uploadFile(request, slug, path=''):
                 for chunk in request.FILES["file"].chunks():
                     destination.write(chunk)
 
+            #return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + filename)
             if path != '':
-                path = '/' + path[:-1]
-            return redirect('file-or-dir-view', slug=slug, path=path + '/' + filename)
-            # return HttpResponse('dirpath: ' + path)
+                return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + filename)
+            else:
+                return redirect('file-or-dir-view', slug=slug, path='/' + filename)
     else:
         form = UploadFileForm()
     return render(request, "vcs/uploadfile.html", {"form": form})
 
 
-def readFile(request, slug, path=''):
+def read_file(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
@@ -120,13 +125,14 @@ def readFile(request, slug, path=''):
 
     context = {
         'file_name': fname,
-        'file_text': file_content
+        'file_text': file_content,
+        'breadcrumbs': breadcrumbs(slug, path)
     }
 
     return render(request, 'vcs/readfile.html', context=context)
 
 
-def editFile(request, slug, path=''):
+def edit_file(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
@@ -173,7 +179,7 @@ def delete(request, slug, path=''):
 
     new_path = ''
     folders = path.split('/')
-    for i in range(len(folders) - 2):
+    for i in range(len(folders) - 1):
         new_path += '/' + folders[i]
 
     if request.method == 'POST':
@@ -183,10 +189,9 @@ def delete(request, slug, path=''):
             shutil.rmtree(dir_path)
 
         return redirect('file-or-dir-view', slug=slug, path=new_path)
-        #return HttpResponse('slug: ' + slug + ' path: ' + path + 'new_path: ' + new_path)
 
     context = {
-        'item_name': folders[-2],
+        'item_name': folders[-1],
         'slug': slug,
         'path': new_path,
     }
@@ -194,21 +199,31 @@ def delete(request, slug, path=''):
     return render(request, 'vcs/delete_item.html', context)
 
 
-def FileOrDirView(request, slug, path=''):
-    if path != '' and path[-1] == '/':
-        path = path[:-1]
+def file_or_dir_view(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
     if os.path.isfile(dir_path):
-        return readFile(request, slug=slug, path=path)
+        return read_file(request, slug=slug, path=path)
 
     elif os.path.isdir(dir_path):
         return RepoDetailView.as_view()(request, slug=slug, path=path)
 
 
+def breadcrumbs(slug, path=''):
+    path_parts = path.split('/')
+    result = reverse('repo-detail', kwargs={'slug': slug})
+    current_path = ['<a href="' + result + '">' + slug + '</a>']
+    if path != '':
+        for part in path_parts[:-1]:
+            result += '/' + part
+            current_path.append('<a href="' + result + '">' + part + '</a>')
+        current_path.append(path_parts[-1])
+    return '&nbsp;/&nbsp;'.join(current_path)
+
+
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
     model = Repository
-    template_name = 'profile.html'
+    template_name = 'vcs/profile.html'
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -229,12 +244,11 @@ class RepoDetailView(generic.DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in the publisher
-        #context["path"] = self.kwargs.get("path", '')
+        context["path"] = self.kwargs.get("path", '')
 
         name = Repository.objects.get(slug=self.kwargs.get("slug")).name
 
         pth = Path(PATH.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
-        # context['list_of_dirs'] = os.walk(pth)
 
         # List of directories only
         context['dirlist'] = [x for x in os.listdir(pth) if os.path.isdir(os.path.join(pth, x))]
@@ -243,10 +257,8 @@ class RepoDetailView(generic.DetailView):
 
         context['len_list'] = len(context['dirlist']) + len(context['filelist'])
 
-        # context['path_parts'] = context['path'].split('/')
-        #
-        # context['current_path'] = ''
-
+        context['breadcrumbs'] = breadcrumbs(self.kwargs.get("slug"), context['path'])
+            
         return context
 
 

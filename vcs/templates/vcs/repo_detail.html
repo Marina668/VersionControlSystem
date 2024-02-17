@@ -1,20 +1,18 @@
 {% extends "vcs/base.html" %}
 
+{% block breadcrumbs %}
+    {{ breadcrumbs |safe }}
+{% endblock %}
+
 {% block top-buttons %}
-
-{#    {% for part in path_parts %}#}
-{#        <a href="{{ current_path }}">{{ part }}</a> /#}
-{#    {% endfor %}#}
-
-
     <div class="button">
-        <a href="{{ request.path|add:'newdir/' }}">Create a directory</a>
+        <a href="{{ request.path|add:'/newdir' }}">Create a directory</a>
     </div>
     <div class="button">
-        <a href="{{ request.path|add:'newfile/' }}">Create a file</a>
+        <a href="{{ request.path|add:'/newfile' }}">Create a file</a>
     </div>
     <div class="button">
-        <a href="{{ request.path|add:'uploadfile/' }}">Upload a file</a>
+        <a href="{{ request.path|add:'/uploadfile' }}">Upload a file</a>
     </div>
 {% endblock %}
 
@@ -38,7 +36,7 @@
     {#    {% endif %}#}
 
     {% if len_list == 0 %}
-        <div class="light">
+        <div class="nothing">
             <p> Nothing is here</p>
         </div>
     {% endif %}
@@ -49,18 +47,18 @@
 
 
         <div class="row-list">
-            <a href="{{ request.path|add:dir|urlencode|add:'/' }}">{{ dir }}</a>
+            <a href="{{ request.path|add:'/'|add:dir|urlencode }}">{{ dir }}</a>
             <div class="button">
-                <a href="{{ request.path|add:dir|urlencode|add:'/'|add:'delete/' }}">Delete</a>
+                <a href="{{ request.path|add:'/'|add:dir|urlencode|add:'/delete' }}">Delete</a>
             </div>
         </div>
     {% endfor %}
 
     {% for file in filelist %}
         <div class="row-list">
-            <a href="{{ request.path|add:file|urlencode|add:'/' }}">{{ file }}</a>
+            <a href="{{ request.path|add:'/'|add:file|urlencode }}">{{ file }}</a>
             <div class="button">
-                <a href="{{ request.path|add:file|urlencode|add:'/'|add:'delete/' }}">Delete</a>
+                <a href="{{ request.path|add:'/'|add:file|urlencode|add:'/delete' }}">Delete</a>
             </div>
         </div>
     {% endfor %}
