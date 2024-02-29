@@ -1,12 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.http import HttpResponse
 
-from .models import Repository
+from .models import Repository, Change
 from .forms import *
 import os
 import shutil
@@ -56,6 +56,14 @@ def new_dir(request, slug, path=''):
             except FileExistsError:
                 print("Directory with the same name already exists")
 
+            repo = get_object_or_404(Repository, slug=slug)
+            if path == '':
+                pth = form.cleaned_data['name']
+            else:
+                pth = path + '/' + form.cleaned_data['name']
+            change = Change(repo=repo, milestone=0, item=pth, change_type='a')
+            change.save()
+
             if path != '':
                 return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
             else:
@@ -80,6 +88,14 @@ def new_file(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
+            repo = get_object_or_404(Repository, slug=slug)
+            if path == '':
+                pth = form.cleaned_data['name']
+            else:
+                pth = path + '/' + form.cleaned_data['name']
+            change = Change(repo=repo, milestone=0, item=pth, change_type='a')
+            change.save()
+
             if path != '':
                 return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
             else:
@@ -102,7 +118,14 @@ def upload_file(request, slug, path=''):
                 for chunk in request.FILES["file"].chunks():
                     destination.write(chunk)
 
-            #return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + filename)
+            repo = get_object_or_404(Repository, slug=slug)
+            if path == '':
+                pth = filename
+            else:
+                pth = path + '/' + filename
+            change = Change(repo=repo, milestone=0, item=pth, change_type='a')
+            change.save()
+
             if path != '':
                 return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + filename)
             else:
@@ -153,6 +176,10 @@ def edit_file(request, slug, path=''):
                     f = open(str(dir_path), "w")
                     f.write(form.cleaned_data['content'])
                     f.close()
+
+                    repo = get_object_or_404(Repository, slug=slug)
+                    change = Change(repo=repo, milestone=0, item=path, change_type='m')
+                    change.save()
             else:
                 os.remove(dir_path)
                 pth = ''
@@ -163,6 +190,17 @@ def edit_file(request, slug, path=''):
                 f = open(str(new_path), "w")
                 f.write(form.cleaned_data['content'])
                 f.close()
+
+                repo = get_object_or_404(Repository, slug=slug)
+                if pth == '':
+                    p = form.cleaned_data['name']
+                else:
+                    p = pth[:-1] + '/' + form.cleaned_data['name']
+                change1 = Change(repo=repo, milestone=0, item=path, change_type='d')
+                change1.save()
+                change2 = Change(repo=repo, milestone=0, item=p, change_type='a')
+                change2.save()
+
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
 
             return redirect('file-or-dir-view', slug=slug, path='/' + path)
@@ -187,6 +225,10 @@ def delete(request, slug, path=''):
             os.remove(dir_path)
         else:
             shutil.rmtree(dir_path)
+
+        repo = get_object_or_404(Repository, slug=slug)
+        change = Change(repo=repo, milestone=0, item=path, change_type='d')
+        change.save()
 
         return redirect('file-or-dir-view', slug=slug, path=new_path)
 
@@ -219,6 +261,8 @@ def breadcrumbs(slug, path=''):
             current_path.append('<a href="' + result + '">' + part + '</a>')
         current_path.append(path_parts[-1])
     return '&nbsp;/&nbsp;'.join(current_path)
+
+
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):

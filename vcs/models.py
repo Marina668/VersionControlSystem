@@ -74,7 +74,7 @@ class Change(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     repo = models.ForeignKey('Repository', on_delete=models.CASCADE)
-    milestone = models.ForeignKey('Milestone', on_delete=models.CASCADE)
+    milestone = models.CharField(max_length=255)
     item = models.CharField(max_length=255)
 
     CHANGES = (
