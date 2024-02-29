@@ -214,6 +214,42 @@ def edit_file(request, slug, path=''):
     return render(request, 'vcs/editfile.html', {'form': form})
 
 
+def edit_dir(request, slug, path=''):
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+
+    path_parts = path.split('/')
+    dir_name = path_parts[-1]
+
+    if request.method == 'POST':
+        form = NewDirForm(request.POST)
+        if form.is_valid():
+            if dir_name == form.cleaned_data['name']:
+                return redirect('file-or-dir-view', slug=slug, path='/' + path)
+            else:
+                pth = ''
+                for i in range(len(path_parts) - 1):
+                    pth += path_parts[i] + '/'
+                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', pth[:-1],
+                                         form.cleaned_data['name'])
+                os.rename(dir_path, new_path)
+
+                repo = get_object_or_404(Repository, slug=slug)
+                if pth == '':
+                    p = form.cleaned_data['name']
+                else:
+                    p = pth[:-1] + '/' + form.cleaned_data['name']
+                change1 = Change(repo=repo, milestone=0, item=path, change_type='d')
+                change1.save()
+                change2 = Change(repo=repo, milestone=0, item=p, change_type='a')
+                change2.save()
+
+                return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
+    else:
+        form = NewDirForm(initial={'name': dir_name})
+    return render(request, 'vcs/editdir.html', {'form': form})
+
+
 def delete(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)

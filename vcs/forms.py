@@ -19,7 +19,7 @@ class NewFileForm(forms.Form):
 
 
 class NewDirForm(forms.Form):
-    name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+    name = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
 
 
 class UploadFileForm(forms.Form):

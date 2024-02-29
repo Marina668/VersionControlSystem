@@ -173,6 +173,16 @@ h3 {
     text-decoration: underline;
 }
 
+.modify-buttons-block{
+    display: inline-flex;
+    justify-content: end;
+    padding: 5px 0;
+}
+
+.modify-buttons-block .button {
+    margin-left: 5px;
+}
+
 .are-you-sure {
     text-align: center;
     font-size: 18px;
@@ -190,3 +200,4 @@ h3 {
     margin: 0 10px;
     padding: 5px;
 }
+
