@@ -2,8 +2,6 @@ from django import forms
 from django.contrib import auth
 from django.contrib.auth.models import User
 
-from pathlib import Path
-
 from vcs.models import Repository
 
 
@@ -26,4 +24,8 @@ class NewDirForm(forms.Form):
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
+
+
+class NewMilestoneForm(forms.Form):
+    description = forms.CharField(widget=forms.Textarea(attrs={"rows": "10"}), initial='')
 

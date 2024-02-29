@@ -1,3 +1,5 @@
+import zipfile
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -6,7 +8,8 @@ from django.urls import reverse
 from django.views import generic
 from django.http import HttpResponse
 
-from .models import Repository, Change
+
+from .models import Repository, Change, Milestone
 from .forms import *
 import os
 import shutil
@@ -263,6 +266,27 @@ def breadcrumbs(slug, path=''):
     return '&nbsp;/&nbsp;'.join(current_path)
 
 
+def new_milestone(request, slug, path=''):
+    content_path = Repository.objects.get(slug=slug).name
+    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content')
+
+    if request.method == 'POST':
+        form = NewMilestoneForm(request.POST)
+        if form.is_valid():
+            milestone = Milestone(description=form.cleaned_data['description'], author=request.user)
+            milestone.save()
+
+            Change.objects.filter(milestone=0).update(milestone=milestone.id)
+
+            mil_path = PATH.joinpath('Repositories', Path(content_path), 'History')
+            shutil.make_archive(str(mil_path.joinpath(str(milestone.id))), 'zip', str(dir_path))
+
+
+            return redirect('repo-detail', slug=slug)
+
+    else:
+        form = NewMilestoneForm()
+    return render(request, 'vcs/newmilestone.html', {'form': form})
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
