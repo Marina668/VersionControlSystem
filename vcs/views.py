@@ -47,6 +47,17 @@ def new_repo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
+def get_path(form, path, slug):
+    repo = get_object_or_404(Repository, slug=slug)
+    if path == '':
+        pth = form.cleaned_data['name']
+    else:
+        pth = path + '/' + form.cleaned_data['name']
+    change = Change(repo=repo, milestone=0, item=pth, change_type='a')
+    change.save()
+    return pth
+
+
 def new_dir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
@@ -59,18 +70,9 @@ def new_dir(request, slug, path=''):
             except FileExistsError:
                 print("Directory with the same name already exists")
 
-            repo = get_object_or_404(Repository, slug=slug)
-            if path == '':
-                pth = form.cleaned_data['name']
-            else:
-                pth = path + '/' + form.cleaned_data['name']
-            change = Change(repo=repo, milestone=0, item=pth, change_type='a')
-            change.save()
+            pth = get_path(form, path, slug)
 
-            if path != '':
-                return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
-            else:
-                return redirect('file-or-dir-view', slug=slug, path='/' + form.cleaned_data['name'])
+            return redirect('file-or-dir-view', slug=slug, path='/' + pth)
 
     else:
         form = NewDirForm()
@@ -91,18 +93,9 @@ def new_file(request, slug, path=''):
             except FileExistsError:
                 print("File with the same name already exists")
 
-            repo = get_object_or_404(Repository, slug=slug)
-            if path == '':
-                pth = form.cleaned_data['name']
-            else:
-                pth = path + '/' + form.cleaned_data['name']
-            change = Change(repo=repo, milestone=0, item=pth, change_type='a')
-            change.save()
+            pth = get_path(form, path, slug)
 
-            if path != '':
-                return redirect('file-or-dir-view', slug=slug, path='/' + path + '/' + form.cleaned_data['name'])
-            else:
-                return redirect('file-or-dir-view', slug=slug, path='/' + form.cleaned_data['name'])
+            return redirect('file-or-dir-view', slug=slug, path='/' + pth)
 
     else:
         form = NewFileForm()
@@ -138,16 +131,18 @@ def upload_file(request, slug, path=''):
     return render(request, "vcs/uploadfile.html", {"form": form})
 
 
-def read_file(request, slug, path=''):
+def get_global_path(path, slug):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
-
-    f = open(str(dir_path), "r")
-    file_content = f.read()
-    f.close()
-
+    with open(str(dir_path), "r") as f:
+        file_content = f.read()
     path_parts = path.split('/')
     fname = path_parts[-1]
+    return file_content, fname, dir_path, path_parts, content_path
+
+
+def read_file(request, slug, path=''):
+    file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
 
     context = {
         'file_name': fname,
@@ -158,24 +153,26 @@ def read_file(request, slug, path=''):
     return render(request, 'vcs/readfile.html', context=context)
 
 
+def save_changes(form, path, pth, slug):
+    repo = get_object_or_404(Repository, slug=slug)
+    if pth == '':
+        p = form.cleaned_data['name']
+    else:
+        p = pth[:-1] + '/' + form.cleaned_data['name']
+    change1 = Change(repo=repo, milestone=0, item=path, change_type='d')
+    change1.save()
+    change2 = Change(repo=repo, milestone=0, item=p, change_type='a')
+    change2.save()
+
+
 def edit_file(request, slug, path=''):
-    content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
-
-    f = open(str(dir_path), "r")
-    file_content = f.read()
-    f.close()
-
-    path_parts = path.split('/')
-    fname = path_parts[-1]
+    file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
 
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
             if fname == form.cleaned_data['name']:
-                if file_content == form.cleaned_data['content']:
-                    return redirect('file-or-dir-view', slug=slug, path='/' + path)
-                else:
+                if file_content != form.cleaned_data['content']:
                     f = open(str(dir_path), "w")
                     f.write(form.cleaned_data['content'])
                     f.close()
@@ -183,6 +180,7 @@ def edit_file(request, slug, path=''):
                     repo = get_object_or_404(Repository, slug=slug)
                     change = Change(repo=repo, milestone=0, item=path, change_type='m')
                     change.save()
+                return redirect('file-or-dir-view', slug=slug, path='/' + path)
             else:
                 os.remove(dir_path)
                 pth = ''
@@ -194,20 +192,9 @@ def edit_file(request, slug, path=''):
                 f.write(form.cleaned_data['content'])
                 f.close()
 
-                repo = get_object_or_404(Repository, slug=slug)
-                if pth == '':
-                    p = form.cleaned_data['name']
-                else:
-                    p = pth[:-1] + '/' + form.cleaned_data['name']
-                change1 = Change(repo=repo, milestone=0, item=path, change_type='d')
-                change1.save()
-                change2 = Change(repo=repo, milestone=0, item=p, change_type='a')
-                change2.save()
+                save_changes(form, path, pth, slug)
 
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
-
-            return redirect('file-or-dir-view', slug=slug, path='/' + path)
-
     else:
         form = NewFileForm(initial={'name': fname, 'content': file_content})
 
@@ -234,15 +221,7 @@ def edit_dir(request, slug, path=''):
                                          form.cleaned_data['name'])
                 os.rename(dir_path, new_path)
 
-                repo = get_object_or_404(Repository, slug=slug)
-                if pth == '':
-                    p = form.cleaned_data['name']
-                else:
-                    p = pth[:-1] + '/' + form.cleaned_data['name']
-                change1 = Change(repo=repo, milestone=0, item=path, change_type='d')
-                change1.save()
-                change2 = Change(repo=repo, milestone=0, item=p, change_type='a')
-                change2.save()
+                save_changes(form, path, pth, slug)
 
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
     else:
@@ -317,9 +296,7 @@ def new_milestone(request, slug, path=''):
             mil_path = PATH.joinpath('Repositories', Path(content_path), 'History')
             shutil.make_archive(str(mil_path.joinpath(str(milestone.id))), 'zip', str(dir_path))
 
-
             return redirect('repo-detail', slug=slug)
-
     else:
         form = NewMilestoneForm()
     return render(request, 'vcs/newmilestone.html', {'form': form})
