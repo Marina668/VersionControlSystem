@@ -1,0 +1,20 @@
+{% extends "vcs/base.html" %}
+
+{% block content %}
+
+    <h1>Milestones: </h1>
+    {% if milestone_list %}
+        <ul>
+            {% for milestone in milestone_list %}
+                <div class="row-list">
+                    <a href="{{ request.path|cut:'/history'|add:milestone.pk }}">{{ milestone.description }}</a>
+                </div>
+            {% endfor %}
+
+        </ul>
+    {% else %}
+        <p>There are no milestones in this repository.</p>
+    {% endif %}
+
+
+{% endblock %}

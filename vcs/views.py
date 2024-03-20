@@ -366,6 +366,28 @@ class RepoDetailView(generic.DetailView):
         return context
 
 
-class UsersListView(LoginRequiredMixin, generic.ListView):
+class UsersListView(generic.ListView):
     model = User
     template_name = 'vcs/repo_detail.html'
+
+
+class MilestonesListView(generic.ListView):
+    model = Milestone
+    template_name = 'vcs/milestones_list.html'
+
+    # def get_queryset(self):
+    #     return Milestone.objects.filter()
+
+
+class MilestoneDetailView(generic.DetailView):
+    model = Change
+    template_name = 'vcs/milestone_detail.html'
+    # queryset = Change.objects.filter(milestone=self.kwargs)
+
+    # def __init__(self, **kwargs):
+    #     super().__init__(kwargs)
+    #     self.milestone_id = None
+
+    def get_queryset(self):
+        self.milestone_id = get_object_or_404(Change, milestone=self.kwargs["milestone_id"])
+        return Change.objects.filter(milestone=self.milestone_id)

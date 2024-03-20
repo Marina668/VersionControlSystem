@@ -17,6 +17,9 @@
     <div class="button">
         <a href="{{ request.path|add:'/newmilestone' }}">Create a milestone</a>
     </div>
+    <div class="button">
+        <a href="{{ request.path|add:'/history' }}">History</a>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -45,10 +48,6 @@
     {% endif %}
 
     {% for dir in dirlist %}
-        {#                    <a href="{% url 'repo-detail' slug=repository.slug path='/'|add:path|add:dir|urlencode %}">{{ dir }}</a><br>#}
-        {#            <a href="/{{repository.slug|add:'/'|add:path|add:dir|urlencode|add:'/' }}">{{ dir }}<br></a>#}
-
-
         <div class="row-list">
             <a href="{{ request.path|add:'/'|add:dir|urlencode }}">{{ dir }}</a>
             <div class="modify-buttons-block">
@@ -75,6 +74,5 @@
             </div>
         </div>
     {% endfor %}
-
 
 {% endblock %}
