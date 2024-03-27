@@ -353,6 +353,15 @@ class MilestonesListView(generic.ListView):
     model = Milestone
     template_name = 'vcs/milestones_list.html'
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+
+        context['repo_slug'] = self.kwargs.get("slug")
+
+        return context
+
     def get_queryset(self):
         self.repo = get_object_or_404(Repository, slug=self.kwargs["slug"])
         return Milestone.objects.filter(repo=self.repo)
@@ -374,6 +383,3 @@ class ChangesListView(generic.ListView):
     def get_queryset(self):
         self.milestone_id = get_object_or_404(Milestone, pk=self.kwargs["pk"])
         return Change.objects.filter(milestone=self.milestone_id)
-
-
-

@@ -1,5 +1,11 @@
 {% extends "vcs/base.html" %}
 
+{% block breadcrumbs %}
+    <div class="button">
+         <a href="{% url 'repo-detail' repo_slug %}">Back</a>
+    </div>
+{% endblock %}
+
 {% block content %}
 
     <h1>Milestones: </h1>
@@ -7,7 +13,7 @@
         <ul>
             {% for milestone in milestone_list %}
                 <div class="row-list">
-                    <a href="{% url 'changes' milestone.id %}">{{ milestone.description }}</a>
+                    <a href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
 {#                    <a href="{{ milestone.id|add:'/changes' }}">{{ milestone.description }}</a>#}
                 </div>
             {% endfor %}

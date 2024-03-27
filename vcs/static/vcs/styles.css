@@ -138,12 +138,17 @@ h3 {
     text-align: left;
     vertical-align: middle;
     margin-left: 10px;
+    padding: 5px 0;
+}
+
+.breadcrumbs-block .button {
+    margin-left: 5px;
 }
 
 .top-buttons-block {
     display: inline-flex;
     justify-content: end;
-    padding: 5px 0;
+    padding: 5px 5px;
 }
 
 .top-buttons-block .button {

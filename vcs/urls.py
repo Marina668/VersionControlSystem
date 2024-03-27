@@ -5,7 +5,7 @@ urlpatterns = [
     path('', views.profile_view, name='profile'),
     path('newrepo', views.new_repo, name='newrepo'),
 
-    path('<int:pk>/changes', views.ChangesListView.as_view(), name='changes'),
+    path('<slug>/<int:pk>/changes', views.ChangesListView.as_view(), name='changes'),
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
     path('<slug>/restore', views.restore_repo, name='restore'),
 
