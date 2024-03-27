@@ -55,7 +55,7 @@ class Change(models.Model):
     """
 
     repo = models.ForeignKey('Repository', on_delete=models.CASCADE)
-    milestone = models.ForeignKey('Milestone', on_delete=models.CASCADE)
+    milestone = models.IntegerField()
     item = models.CharField(max_length=255)
 
     CHANGES = (

@@ -381,5 +381,6 @@ class ChangesListView(generic.ListView):
         return context
 
     def get_queryset(self):
-        self.milestone_id = get_object_or_404(Milestone, pk=self.kwargs["pk"])
+        # self.milestone_id = get_object_or_404(Milestone, pk=self.kwargs["pk"])
+        self.milestone_id = self.kwargs["pk"]
         return Change.objects.filter(milestone=self.milestone_id)
