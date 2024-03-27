@@ -18,7 +18,7 @@
         <a href="{{ request.path|add:'/newmilestone' }}">Create a milestone</a>
     </div>
     <div class="button">
-        <a href="{{ request.path|add:'/history' }}">History</a>
+        <a href="{% url 'history' repository.slug %}">History</a>
     </div>
 {% endblock %}
 

@@ -1,8 +1,21 @@
 {% extends "vcs/base.html" %}
 
+{% block top-buttons %}
+    <div class="button">
+         <a href="{% url 'restore' repo_slug %}">Restore</a>
+    </div>
+{% endblock %}
+
 {% block content %}
 
-<h1>Yes</h1>
+    <h1>Changes: </h1>
+
+    {% for change in change_list %}
+        <div class="row-list">
+            <p>{{ change.item }} {{ change.change_type }}</p>
+        </div>
+    {% endfor %}
+
 
 
 {% endblock %}

@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.views import generic
 from django.http import HttpResponse
 
-
 from .models import Repository, Change, Milestone
 from .forms import *
 import os
@@ -87,9 +86,8 @@ def new_file(request, slug, path=''):
             dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
                                      form.cleaned_data['name'])
             try:
-                f = open(str(dir_path), "w")
-                f.write(form.cleaned_data['content'])
-                f.close()
+                with open(str(dir_path), "w") as f:
+                    f.write(form.cleaned_data['content'])
             except FileExistsError:
                 print("File with the same name already exists")
 
@@ -173,9 +171,8 @@ def edit_file(request, slug, path=''):
         if form.is_valid():
             if fname == form.cleaned_data['name']:
                 if file_content != form.cleaned_data['content']:
-                    f = open(str(dir_path), "w")
-                    f.write(form.cleaned_data['content'])
-                    f.close()
+                    with open(str(dir_path), "w") as f:
+                        f.write(form.cleaned_data['content'])
 
                     repo = get_object_or_404(Repository, slug=slug)
                     change = Change(repo=repo, milestone=0, item=path, change_type='m')
@@ -188,9 +185,8 @@ def edit_file(request, slug, path=''):
                     pth += path_parts[i] + '/'
                 new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', pth[:-1],
                                          form.cleaned_data['name'])
-                f = open(str(new_path), "w")
-                f.write(form.cleaned_data['content'])
-                f.close()
+                with open(str(new_path), "w") as f:
+                    f.write(form.cleaned_data['content'])
 
                 save_changes(form, path, pth, slug)
 
@@ -284,14 +280,15 @@ def breadcrumbs(slug, path=''):
 def new_milestone(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content')
+    repo = get_object_or_404(Repository, slug=slug)
 
     if request.method == 'POST':
         form = NewMilestoneForm(request.POST)
         if form.is_valid():
-            milestone = Milestone(description=form.cleaned_data['description'], author=request.user)
+            milestone = Milestone(description=form.cleaned_data['description'], author=request.user, repo=repo)
             milestone.save()
 
-            Change.objects.filter(milestone=0).update(milestone=milestone.id)
+            Change.objects.filter(milestone=0, repo=repo).update(milestone=milestone.id)
 
             mil_path = PATH.joinpath('Repositories', Path(content_path), 'History')
             shutil.make_archive(str(mil_path.joinpath(str(milestone.id))), 'zip', str(dir_path))
@@ -300,6 +297,10 @@ def new_milestone(request, slug, path=''):
     else:
         form = NewMilestoneForm()
     return render(request, 'vcs/newmilestone.html', {'form': form})
+
+
+def restore_repo(request, slug):
+    return HttpResponse(slug)
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -339,7 +340,7 @@ class RepoDetailView(generic.DetailView):
         context['len_list'] = len(context['dirlist']) + len(context['filelist'])
 
         context['breadcrumbs'] = breadcrumbs(self.kwargs.get("slug"), context['path'])
-            
+
         return context
 
 
@@ -352,19 +353,28 @@ class MilestonesListView(generic.ListView):
     model = Milestone
     template_name = 'vcs/milestones_list.html'
 
-    # def get_queryset(self):
-    #     return Milestone.objects.filter()
+    def get_queryset(self):
+        self.repo = get_object_or_404(Repository, slug=self.kwargs["slug"])
+        return Milestone.objects.filter(repo=self.repo)
 
 
-class MilestoneDetailView(generic.DetailView):
+class ChangesListView(generic.ListView):
     model = Change
     template_name = 'vcs/milestone_detail.html'
-    # queryset = Change.objects.filter(milestone=self.kwargs)
 
-    # def __init__(self, **kwargs):
-    #     super().__init__(kwargs)
-    #     self.milestone_id = None
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+
+        context['repo_slug'] = Milestone.objects.get(pk=self.kwargs.get("pk")).repo.slug
+        #context['repo_slug'] = Repository.objects.get(pk=repo_id).slug
+
+        return context
 
     def get_queryset(self):
-        self.milestone_id = get_object_or_404(Change, milestone=self.kwargs["milestone_id"])
+        self.milestone_id = get_object_or_404(Milestone, pk=self.kwargs["pk"])
         return Change.objects.filter(milestone=self.milestone_id)
+
+
+

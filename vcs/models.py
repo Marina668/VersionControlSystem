@@ -40,6 +40,7 @@ class Milestone(models.Model):
     description = models.TextField(max_length=1000)
     created = models.DateTimeField(auto_now_add=True, blank=True)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    repo = models.ForeignKey('Repository', on_delete=models.CASCADE)
 
     def __str__(self):
         """
@@ -54,7 +55,7 @@ class Change(models.Model):
     """
 
     repo = models.ForeignKey('Repository', on_delete=models.CASCADE)
-    milestone = models.CharField(max_length=255)
+    milestone = models.ForeignKey('Milestone', on_delete=models.CASCADE)
     item = models.CharField(max_length=255)
 
     CHANGES = (
