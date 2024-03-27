@@ -12,7 +12,7 @@
 
     {% for change in change_list %}
         <div class="row-list">
-            <p>{{ change.item }} {{ change.change_type }}</p>
+            <p>{{ change.item }} {{ change.get_change_type_display }}</p>
         </div>
     {% endfor %}
 

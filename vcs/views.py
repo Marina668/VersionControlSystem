@@ -368,7 +368,6 @@ class ChangesListView(generic.ListView):
         # Add in the publisher
 
         context['repo_slug'] = Milestone.objects.get(pk=self.kwargs.get("pk")).repo.slug
-        #context['repo_slug'] = Repository.objects.get(pk=repo_id).slug
 
         return context
 
