@@ -1,5 +1,3 @@
-import zipfile
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -299,8 +297,24 @@ def new_milestone(request, slug, path=''):
     return render(request, 'vcs/newmilestone.html', {'form': form})
 
 
-def restore_repo(request, slug):
-    return HttpResponse(slug)
+def restore_repo(request, slug, mil_id):
+    name_of_repo = Repository.objects.get(slug=slug).name
+    content_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Content')
+    dir_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Temporary')
+    milestone_path = PATH.joinpath('Repositories', Path(name_of_repo), 'History', str(mil_id) + '.zip')
+    os.mkdir(dir_path)
+    shutil.unpack_archive(milestone_path, dir_path, "zip")
+
+    shutil.rmtree(content_path)
+    os.rename(dir_path, content_path)
+
+    mil_description = Milestone.objects.get(id=mil_id).description
+    repo = get_object_or_404(Repository, slug=slug)
+    milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
+                          repo=repo)
+    milestone.save()
+
+    return RepoDetailView.as_view()(request, slug=slug)
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
@@ -377,10 +391,10 @@ class ChangesListView(generic.ListView):
         # Add in the publisher
 
         context['repo_slug'] = Milestone.objects.get(pk=self.kwargs.get("pk")).repo.slug
+        context['milestone_id'] = self.kwargs.get("pk")
 
         return context
 
     def get_queryset(self):
-        # self.milestone_id = get_object_or_404(Milestone, pk=self.kwargs["pk"])
         self.milestone_id = self.kwargs["pk"]
         return Change.objects.filter(milestone=self.milestone_id)

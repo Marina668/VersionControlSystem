@@ -7,7 +7,7 @@ urlpatterns = [
 
     path('<slug>/<int:pk>/changes', views.ChangesListView.as_view(), name='changes'),
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
-    path('<slug>/restore', views.restore_repo, name='restore'),
+    path('<slug>/<int:mil_id>/restore', views.restore_repo, name='restore'),
 
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newdir$', views.new_dir, name='newdir'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newfile$', views.new_file, name='newfile'),

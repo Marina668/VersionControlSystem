@@ -3,13 +3,12 @@
 {% block breadcrumbs %}
     <div class="button">
          <a href="{% url 'history' repo_slug %}">Back</a>
-{#        <a href="{{ repo_slug|add:'/history' }}">Back</a>#}
     </div>
 {% endblock %}
 
 {% block top-buttons %}
     <div class="button">
-         <a href="{% url 'restore' repo_slug %}">Restore</a>
+         <a href="{% url 'restore' repo_slug milestone_id %}">Restore</a>
     </div>
 {% endblock %}
 
