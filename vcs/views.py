@@ -302,6 +302,7 @@ def restore_repo(request, slug, mil_id):
     content_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Content')
     dir_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Temporary')
     milestone_path = PATH.joinpath('Repositories', Path(name_of_repo), 'History', str(mil_id) + '.zip')
+    new_mil_path = PATH.joinpath('Repositories', Path(name_of_repo), 'History')
     os.mkdir(dir_path)
     shutil.unpack_archive(milestone_path, dir_path, "zip")
 
@@ -314,7 +315,9 @@ def restore_repo(request, slug, mil_id):
                           repo=repo)
     milestone.save()
 
-    return RepoDetailView.as_view()(request, slug=slug)
+    shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
+
+    return redirect('repo-detail', slug=slug)
 
 
 class RepositoryListView(LoginRequiredMixin, generic.ListView):
