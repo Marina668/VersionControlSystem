@@ -1,0 +1,13 @@
+{% extends "vcs/base.html" %}
+
+{% block content %}
+
+<h1>Choose user</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p class="buttonSubmit">
+    <button type="submit">Add</button>
+</form>
+
+{% endblock %}

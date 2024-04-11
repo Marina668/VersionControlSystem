@@ -29,3 +29,8 @@ class UploadFileForm(forms.Form):
 class NewMilestoneForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea(attrs={"rows": "10"}), initial='')
 
+
+class AddUserForm(forms.Form):
+    username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+    # username = forms.ModelChoiceField(queryset=User.objects.all(), initial='',
+    #                                   widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))

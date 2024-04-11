@@ -64,6 +64,7 @@ form p {
     display: flex;
     justify-content: space-between;
 }
+
 input {
     width: 300px;
     margin: 5px 0;
@@ -176,6 +177,10 @@ h3 {
 
 .row-list a:hover {
     text-decoration: underline;
+}
+
+.changes {
+    justify-content: end;
 }
 
 .modify-buttons-block{

@@ -2,13 +2,13 @@
 
 {% block breadcrumbs %}
     <div class="button">
-         <a href="{% url 'history' repo_slug %}">Back</a>
+        <a href="{% url 'history' repo_slug %}">Back</a>
     </div>
 {% endblock %}
 
 {% block top-buttons %}
     <div class="button">
-         <a href="{% url 'restore' repo_slug milestone_id %}">Restore</a>
+        <a href="{% url 'restore' repo_slug milestone_id %}">Restore</a>
     </div>
 {% endblock %}
 
@@ -18,10 +18,11 @@
 
     {% for change in change_list %}
         <div class="row-list">
-            <p>{{ change.item }} {{ change.get_change_type_display }}</p>
+            {{ change.item }}
+            <div class="changes">
+                {{ change.get_change_type_display }}
+            </div>
         </div>
     {% endfor %}
-
-
 
 {% endblock %}

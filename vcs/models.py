@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -11,8 +10,9 @@ class Repository(models.Model):
     """
 
     name = models.CharField(max_length=255)
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    author = models.ForeignKey('auth.User', related_name='author', on_delete=models.CASCADE)
     slug = models.SlugField(default="", null=False, unique=True)
+    users = models.ManyToManyField('auth.User', related_name='user')
 
     def __str__(self):
         """
@@ -65,12 +65,3 @@ class Change(models.Model):
     )
 
     change_type = models.CharField(max_length=1, choices=CHANGES)
-
-
-class UserRepo(models.Model):
-    """
-    Model representing a communication between users and repositories (which users have rights to which repositories)
-    """
-
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    repo = models.ForeignKey('Repository', on_delete=models.CASCADE)

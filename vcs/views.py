@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -320,7 +321,22 @@ def restore_repo(request, slug, mil_id):
     return redirect('repo-detail', slug=slug)
 
 
-class RepositoryListView(LoginRequiredMixin, generic.ListView):
+def add_user(request, slug):
+    if request.method == 'POST':
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            repo = get_object_or_404(Repository, slug=slug)
+            username = form.cleaned_data['username']
+            user = get_object_or_404(User, username=username)
+            repo.users.add(user)
+            return redirect('repo-detail', slug=slug)
+
+    else:
+        form = AddUserForm()
+    return render(request, 'vcs/adduser.html', {'form': form})
+
+
+class RepositoryListView(generic.ListView):
     model = Repository
     template_name = 'vcs/profile.html'
 
@@ -364,6 +380,10 @@ class RepoDetailView(generic.DetailView):
 class UsersListView(generic.ListView):
     model = User
     template_name = 'vcs/repo_detail.html'
+
+    def get_queryset(self):
+        self.repo_id = Repository.objects.get(slug=self.kwargs.get("slug")).id
+        return User.objects.filter(repository=self.repo_id)
 
 
 class MilestonesListView(generic.ListView):

@@ -14,7 +14,6 @@
             {% for milestone in milestone_list %}
                 <div class="row-list">
                     <a href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
-{#                    <a href="{{ milestone.id|add:'/changes' }}">{{ milestone.description }}</a>#}
                 </div>
             {% endfor %}
 

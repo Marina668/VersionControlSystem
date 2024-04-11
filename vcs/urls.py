@@ -9,6 +9,8 @@ urlpatterns = [
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
     path('<slug>/<int:mil_id>/restore', views.restore_repo, name='restore'),
 
+    path('<slug>/adduser', views.add_user, name='adduser'),
+
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newdir$', views.new_dir, name='newdir'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newfile$', views.new_file, name='newfile'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/uploadfile$', views.upload_file, name='uploadfile'),
@@ -17,11 +19,10 @@ urlpatterns = [
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)?/edit$', views.edit_file, name='editfile'),
 
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newmilestone$', views.new_milestone, name='newmilestone'),
-    # re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/history$', views.MilestonesListView.as_view(), name='history'),
-    # re_path(r'^(?P<id>[\w-]+)\/?(?P<path>[- %\w\/]+)?/something$', views.MilestoneDetailView.as_view(), name='sth'),
 
 
     re_path(r'^(?P<slug>[\w-]+)$', views.RepoDetailView.as_view(), name='repo-detail'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)$', views.file_or_dir_view, name='file-or-dir-view'),
+
 
 ]
