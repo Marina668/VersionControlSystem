@@ -379,11 +379,19 @@ class RepoDetailView(generic.DetailView):
 
 class UsersListView(generic.ListView):
     model = User
-    template_name = 'vcs/repo_detail.html'
+    template_name = 'vcs/users_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['repo_slug'] = self.kwargs.get("slug")
+        context['repo_author'] = Repository.objects.get(slug=self.kwargs.get("slug")).author
+
+        return context
 
     def get_queryset(self):
-        self.repo_id = Repository.objects.get(slug=self.kwargs.get("slug")).id
-        return User.objects.filter(repository=self.repo_id)
+        self.repo = get_object_or_404(Repository, slug=self.kwargs.get("slug"))
+        return self.repo.users.all()
 
 
 class MilestonesListView(generic.ListView):

@@ -20,6 +20,9 @@
     <div class="button">
         <a href="{% url 'history' repository.slug %}">History</a>
     </div>
+    <div class="button">
+        <a href="{% url 'users_list' repository.slug %}">Users</a>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -60,34 +63,6 @@
             </div>
         </div>
     {% endfor %}
-
-
-    <h3>Users who have access: </h3>
-
-    {#    {% if user_list %}#}
-    {#        <ul>#}
-    {#            {% for user in user_list %}#}
-    {#                    <a>{{ something }}</a>#}
-    {#            {% endfor %}#}
-    {#        </ul>#}
-    {#    {% else %}#}
-    {#        <p>There are no users who have access.</p>#}
-    {#    {% endif %}#}
-
-     <p>{{ something }}</p>
-
-    {% if user_list %}
-        {% for user in user_list %}
-            <p>{{ user.username }}</p>
-        {% endfor %}
-    {% else %}
-        <p>There are no users who have access.</p>
-    {% endif %}
-
-    <div class="button">
-        <a href="{% url 'adduser' repository.slug %}">Add user</a>
-    </div>
-
 
 
 {% endblock %}

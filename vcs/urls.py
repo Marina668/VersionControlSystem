@@ -9,6 +9,7 @@ urlpatterns = [
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
     path('<slug>/<int:mil_id>/restore', views.restore_repo, name='restore'),
 
+    path('<slug>/users', views.UsersListView.as_view(), name='users_list'),
     path('<slug>/adduser', views.add_user, name='adduser'),
 
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newdir$', views.new_dir, name='newdir'),

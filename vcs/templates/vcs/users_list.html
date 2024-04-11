@@ -1,0 +1,38 @@
+{% extends "vcs/base.html" %}
+
+{% block breadcrumbs %}
+    <div class="button">
+        <a href="{% url 'repo-detail' repo_slug %}">Back</a>
+    </div>
+{% endblock %}
+
+{% block top-buttons %}
+    <div class="button">
+        <a href="{% url 'adduser' repo_slug %}">Add user</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <h1>Users: </h1>
+
+    {% if user_list %}
+
+        <div class="row-list">
+            <p>{{ repo_author }}</p>
+        </div>
+
+        {% for user in user_list %}
+            <div class="row-list">
+                <p>{{ user.username }}</p>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="row-list">
+            <p>{{ repo_author }}</p>
+        </div>
+    {% endif %}
+
+
+{% endblock %}
