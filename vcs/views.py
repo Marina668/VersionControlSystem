@@ -336,6 +336,21 @@ def add_user(request, slug):
     return render(request, 'vcs/adduser.html', {'form': form})
 
 
+def delete_user(request, slug, username):
+    if request.method == 'POST':
+        repo = get_object_or_404(Repository, slug=slug)
+        user = get_object_or_404(User, username=username)
+        repo.users.remove(user)
+        return redirect('users_list', slug=slug)
+
+    context = {
+        'user_name': username,
+        'slug': slug,
+    }
+
+    return render(request, 'vcs/delete_user.html', context)
+
+
 class RepositoryListView(generic.ListView):
     model = Repository
     template_name = 'vcs/profile.html'

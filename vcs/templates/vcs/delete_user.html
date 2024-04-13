@@ -1,0 +1,17 @@
+{% extends "vcs/base.html" %}
+
+{% block content %}
+
+     <form method="POST" action="" name="confirm_delete">
+        {% csrf_token %}
+         <h1>Deleting user</h1>
+        <div class="are-you-sure">
+            Are you sure you want to delete {{ user_name }}?
+        </div>
+        <div class="confirm-buttons">
+            <button type="submit">Yes</button>
+            <button type="button" onclick="location.href = '{% url 'users_list' slug=slug %}';">Cancel</button>
+            </div>
+        </form>
+
+{% endblock %}

@@ -19,18 +19,23 @@
     {% if user_list %}
 
         <div class="row-list">
-            <p>{{ repo_author }}</p>
+            <div class="user-list-author"> {{ repo_author }}</div>
         </div>
 
         {% for user in user_list %}
             <div class="row-list">
-                <p>{{ user.username }}</p>
+                {{ user.username }}
+                <div class="modify-buttons-block">
+                    <div class="button">
+                        <a href="{{ request.path|cut:'/users'|add:'/'|add:user.username|urlencode|add:'/deleteuser' }}">Delete</a>
+                    </div>
+                </div>
             </div>
         {% endfor %}
 
     {% else %}
         <div class="row-list">
-            <p>{{ repo_author }}</p>
+            <div class="user-list-author"> {{ repo_author }}</div>
         </div>
     {% endif %}
 
