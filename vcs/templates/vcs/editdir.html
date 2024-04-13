@@ -6,9 +6,11 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <p class="buttonSubmit">
-    <button type="submit">Update</button>
-    </p>
+        <div class="confirm-buttons">
+            <button type="submit">Create</button>
+            <button type="button" onclick="location.href = '{% url 'file-or-dir-view' slug=slug path=path %}';">Back
+            </button>
+        </div>
 </form>
 
 

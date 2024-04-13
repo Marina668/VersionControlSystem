@@ -125,7 +125,7 @@ def upload_file(request, slug, path=''):
                 return redirect('file-or-dir-view', slug=slug, path='/' + filename)
     else:
         form = UploadFileForm()
-    return render(request, "vcs/uploadfile.html", {"form": form})
+    return render(request, "vcs/uploadfile.html", {'form': form})
 
 
 def get_global_path(path, slug):
@@ -162,6 +162,14 @@ def save_changes(form, path, pth, slug):
     change2.save()
 
 
+def split_path(path):
+    new_path = ''
+    folders = path.split('/')
+    for i in range(len(folders) - 1):
+        new_path += '/' + folders[i]
+    return new_path
+
+
 def edit_file(request, slug, path=''):
     file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
 
@@ -193,7 +201,7 @@ def edit_file(request, slug, path=''):
     else:
         form = NewFileForm(initial={'name': fname, 'content': file_content})
 
-    return render(request, 'vcs/editfile.html', {'form': form})
+    return render(request, 'vcs/editfile.html', {'form': form, 'slug': slug, 'path': split_path(path)})
 
 
 def edit_dir(request, slug, path=''):
@@ -221,7 +229,7 @@ def edit_dir(request, slug, path=''):
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
     else:
         form = NewDirForm(initial={'name': dir_name})
-    return render(request, 'vcs/editdir.html', {'form': form})
+    return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': split_path(path)})
 
 
 def delete(request, slug, path=''):
@@ -310,13 +318,14 @@ def restore_repo(request, slug, mil_id):
     shutil.rmtree(content_path)
     os.rename(dir_path, content_path)
 
-    mil_description = Milestone.objects.get(id=mil_id).description
-    repo = get_object_or_404(Repository, slug=slug)
-    milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
-                          repo=repo)
-    milestone.save()
+    # mil_description = Milestone.objects.get(id=mil_id).description
+    # repo = get_object_or_404(Repository, slug=slug)
+    # milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
+    #                       repo=repo)
+    # milestone.save()
 
-    shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
+    # shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
+
 
     return redirect('repo-detail', slug=slug)
 
@@ -333,7 +342,8 @@ def add_user(request, slug):
 
     else:
         form = AddUserForm()
-    return render(request, 'vcs/adduser.html', {'form': form})
+
+    return render(request, 'vcs/adduser.html', {'form': form, 'slug': slug})
 
 
 def delete_user(request, slug, username):

@@ -31,6 +31,8 @@ class NewMilestoneForm(forms.Form):
 
 
 class AddUserForm(forms.Form):
-    username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
-    # username = forms.ModelChoiceField(queryset=User.objects.all(), initial='',
-    #                                   widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+    #username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+
+    username = forms.ModelChoiceField(queryset=User.objects.all(), empty_label='Select user')
+
+

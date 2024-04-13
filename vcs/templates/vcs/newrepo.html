@@ -2,12 +2,15 @@
 
 {% block content %}
 
-<h1>New repository</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <p class="buttonSubmit">
-    <button type="submit">Create</button>
-</form>
+    <h1>New repository</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="confirm-buttons">
+            <button type="submit">Create</button>
+            <button type="button" onclick="location.href = '{{ request.path|cut:'/newrepo' }}';">Back
+            </button>
+        </div>
+    </form>
 
 {% endblock %}

@@ -2,14 +2,16 @@
 
 {% block content %}
 
-<h1>Upload file</h1>
-<form method="POST" class="filedata" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <p class="buttonSubmit">
-    <button type="submit">Upload</button>
-    </p>
-</form>
+    <h1>Upload file</h1>
+    <form method="POST" class="filedata" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="confirm-buttons">
+            <button type="submit">Create</button>
+            <button type="button" onclick="location.href = '{{ request.path|cut:'/uploadfile' }}';">Back
+            </button>
+        </div>
+    </form>
 
 
 {% endblock %}
