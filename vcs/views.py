@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from .models import Repository, Change, Milestone
 from .forms import *
@@ -23,6 +25,7 @@ def profile_view(request):
         return redirect('login')
 
 
+@login_required
 def new_repo(request):
     if request.method == 'POST':
         form = NewRepoForm(request.POST)
@@ -45,6 +48,7 @@ def new_repo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
+@login_required
 def get_path(form, path, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if path == '':
@@ -56,6 +60,7 @@ def get_path(form, path, slug):
     return pth
 
 
+@login_required
 def new_dir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
@@ -77,6 +82,7 @@ def new_dir(request, slug, path=''):
     return render(request, 'vcs/newdir.html', {'form': form})
 
 
+@login_required
 def new_file(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
@@ -99,6 +105,7 @@ def new_file(request, slug, path=''):
     return render(request, 'vcs/newfile.html', {'form': form})
 
 
+@login_required
 def upload_file(request, slug, path=''):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
@@ -128,6 +135,7 @@ def upload_file(request, slug, path=''):
     return render(request, "vcs/uploadfile.html", {'form': form})
 
 
+@login_required
 def get_global_path(path, slug):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
@@ -138,6 +146,7 @@ def get_global_path(path, slug):
     return file_content, fname, dir_path, path_parts, content_path
 
 
+@login_required
 def read_file(request, slug, path=''):
     file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
 
@@ -150,6 +159,7 @@ def read_file(request, slug, path=''):
     return render(request, 'vcs/readfile.html', context=context)
 
 
+@login_required
 def save_changes(form, path, pth, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if pth == '':
@@ -162,14 +172,16 @@ def save_changes(form, path, pth, slug):
     change2.save()
 
 
+@login_required
 def split_path(path):
     new_path = ''
     folders = path.split('/')
     for i in range(len(folders) - 1):
         new_path += '/' + folders[i]
-    return new_path
+    return new_path, folders
 
 
+@login_required
 def edit_file(request, slug, path=''):
     file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
 
@@ -204,6 +216,7 @@ def edit_file(request, slug, path=''):
     return render(request, 'vcs/editfile.html', {'form': form, 'slug': slug, 'path': split_path(path)})
 
 
+@login_required
 def edit_dir(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
@@ -232,14 +245,12 @@ def edit_dir(request, slug, path=''):
     return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': split_path(path)})
 
 
+@login_required
 def delete(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
 
-    new_path = ''
-    folders = path.split('/')
-    for i in range(len(folders) - 1):
-        new_path += '/' + folders[i]
+    new_path, folders = split_path(path)
 
     if request.method == 'POST':
         if os.path.isfile(dir_path):
@@ -262,6 +273,7 @@ def delete(request, slug, path=''):
     return render(request, 'vcs/delete_item.html', context)
 
 
+@login_required
 def file_or_dir_view(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
@@ -284,6 +296,7 @@ def breadcrumbs(slug, path=''):
     return '&nbsp;/&nbsp;'.join(current_path)
 
 
+@login_required
 def new_milestone(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content')
@@ -306,6 +319,7 @@ def new_milestone(request, slug, path=''):
     return render(request, 'vcs/newmilestone.html', {'form': form})
 
 
+@login_required
 def restore_repo(request, slug, mil_id):
     name_of_repo = Repository.objects.get(slug=slug).name
     content_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Content')
@@ -326,10 +340,10 @@ def restore_repo(request, slug, mil_id):
 
     # shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
 
-
     return redirect('repo-detail', slug=slug)
 
 
+@login_required
 def add_user(request, slug):
     if request.method == 'POST':
         form = AddUserForm(request.POST)
@@ -346,6 +360,7 @@ def add_user(request, slug):
     return render(request, 'vcs/adduser.html', {'form': form, 'slug': slug})
 
 
+@login_required
 def delete_user(request, slug, username):
     if request.method == 'POST':
         repo = get_object_or_404(Repository, slug=slug)
@@ -361,6 +376,7 @@ def delete_user(request, slug, username):
     return render(request, 'vcs/delete_user.html', context)
 
 
+@method_decorator(login_required, name='dispatch')
 class RepositoryListView(generic.ListView):
     model = Repository
     template_name = 'vcs/profile.html'
@@ -370,12 +386,16 @@ class RepositoryListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         # Add in the publisher
         context["path"] = self.kwargs.get("path", '')
+
+        context['other_repo_list'] = Repository.objects.filter(users=self.request.user)
+
         return context
 
     def get_queryset(self):
         return Repository.objects.filter(author=self.request.user)
 
 
+@method_decorator(login_required, name='dispatch')
 class RepoDetailView(generic.DetailView):
     model = Repository
     template_name = 'vcs/repo_detail.html'
@@ -402,6 +422,7 @@ class RepoDetailView(generic.DetailView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class UsersListView(generic.ListView):
     model = User
     template_name = 'vcs/users_list.html'
@@ -419,6 +440,7 @@ class UsersListView(generic.ListView):
         return self.repo.users.all()
 
 
+@method_decorator(login_required, name='dispatch')
 class MilestonesListView(generic.ListView):
     model = Milestone
     template_name = 'vcs/milestones_list.html'
@@ -437,6 +459,7 @@ class MilestonesListView(generic.ListView):
         return Milestone.objects.filter(repo=self.repo)
 
 
+@method_decorator(login_required, name='dispatch')
 class ChangesListView(generic.ListView):
     model = Change
     template_name = 'vcs/milestone_detail.html'

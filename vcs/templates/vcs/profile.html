@@ -22,11 +22,18 @@
             <div class="nothing">
                 <p>There are no repositories.</p>
             </div>
-
         {% endif %}
 
 
+        <h3>Other Repositories: </h3>
 
+        {% if other_repo_list %}
+            {% for other_repo in other_repo_list %}
+                <div class="row-list">
+                    <a href="{{ other_repo.slug }}">{{ other_repo.name }}</a>
+                </div>
+            {% endfor %}
+        {% endif %}
 
     {% endif %}
 
