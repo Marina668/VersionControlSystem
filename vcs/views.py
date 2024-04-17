@@ -30,16 +30,13 @@ def new_repo(request):
     if request.method == 'POST':
         form = NewRepoForm(request.POST)
         if form.is_valid():
-            repositories_path = PATH.joinpath('Repositories', form.cleaned_data['name'], 'Content')
-            try:
-                os.makedirs(repositories_path)
-                os.mkdir(PATH.joinpath('Repositories', form.cleaned_data['name'], 'History'))
-            except FileExistsError:
-                print("Repository with the same name already exists")
-
             detail = form.save(commit=False)
             detail.author = request.user
             detail.save()
+
+            repositories_path = PATH.joinpath('Repositories', detail.slug, 'Content')
+            os.makedirs(repositories_path)
+            os.mkdir(PATH.joinpath('Repositories', detail.slug, 'History'))
 
             return redirect('repo-detail', slug=detail.slug)
 
@@ -48,7 +45,6 @@ def new_repo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
-@login_required
 def get_path(form, path, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if path == '':
@@ -66,7 +62,7 @@ def new_dir(request, slug, path=''):
         form = NewDirForm(request.POST)
         if form.is_valid():
             content_path = Repository.objects.get(slug=slug).name
-            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
+            dir_path = PATH.joinpath('Repositories', slug, 'Content', path,
                                      form.cleaned_data['name'])
             try:
                 os.mkdir(dir_path)
@@ -88,7 +84,7 @@ def new_file(request, slug, path=''):
         form = NewFileForm(request.POST)
         if form.is_valid():
             content_path = Repository.objects.get(slug=slug).name
-            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path,
+            dir_path = PATH.joinpath('Repositories', slug, 'Content', path,
                                      form.cleaned_data['name'])
             try:
                 with open(str(dir_path), "w") as f:
@@ -112,7 +108,7 @@ def upload_file(request, slug, path=''):
         if form.is_valid():
             content_path = Repository.objects.get(slug=slug).name
             filename = request.FILES["file"].name
-            dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path, filename)
+            dir_path = PATH.joinpath('Repositories', slug, 'Content', path, filename)
 
             with open(str(dir_path), "wb+") as destination:
                 for chunk in request.FILES["file"].chunks():
@@ -135,10 +131,9 @@ def upload_file(request, slug, path=''):
     return render(request, "vcs/uploadfile.html", {'form': form})
 
 
-@login_required
 def get_global_path(path, slug):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+    dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
     with open(str(dir_path), "r") as f:
         file_content = f.read()
     path_parts = path.split('/')
@@ -159,7 +154,6 @@ def read_file(request, slug, path=''):
     return render(request, 'vcs/readfile.html', context=context)
 
 
-@login_required
 def save_changes(form, path, pth, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if pth == '':
@@ -172,7 +166,6 @@ def save_changes(form, path, pth, slug):
     change2.save()
 
 
-@login_required
 def split_path(path):
     new_path = ''
     folders = path.split('/')
@@ -202,7 +195,7 @@ def edit_file(request, slug, path=''):
                 pth = ''
                 for i in range(len(path_parts) - 1):
                     pth += path_parts[i] + '/'
-                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', pth[:-1],
+                new_path = PATH.joinpath('Repositories', slug, 'Content', pth[:-1],
                                          form.cleaned_data['name'])
                 with open(str(new_path), "w") as f:
                     f.write(form.cleaned_data['content'])
@@ -219,7 +212,7 @@ def edit_file(request, slug, path=''):
 @login_required
 def edit_dir(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+    dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
 
     path_parts = path.split('/')
     dir_name = path_parts[-1]
@@ -233,7 +226,7 @@ def edit_dir(request, slug, path=''):
                 pth = ''
                 for i in range(len(path_parts) - 1):
                     pth += path_parts[i] + '/'
-                new_path = PATH.joinpath('Repositories', Path(content_path), 'Content', pth[:-1],
+                new_path = PATH.joinpath('Repositories', slug, 'Content', pth[:-1],
                                          form.cleaned_data['name'])
                 os.rename(dir_path, new_path)
 
@@ -242,13 +235,13 @@ def edit_dir(request, slug, path=''):
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
     else:
         form = NewDirForm(initial={'name': dir_name})
-    return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': split_path(path)})
+    return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': path})
 
 
 @login_required
 def delete(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+    dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
 
     new_path, folders = split_path(path)
 
@@ -276,7 +269,7 @@ def delete(request, slug, path=''):
 @login_required
 def file_or_dir_view(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content', path)
+    dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
     if os.path.isfile(dir_path):
         return read_file(request, slug=slug, path=path)
 
@@ -299,7 +292,7 @@ def breadcrumbs(slug, path=''):
 @login_required
 def new_milestone(request, slug, path=''):
     content_path = Repository.objects.get(slug=slug).name
-    dir_path = PATH.joinpath('Repositories', Path(content_path), 'Content')
+    dir_path = PATH.joinpath('Repositories', slug, 'Content')
     repo = get_object_or_404(Repository, slug=slug)
 
     if request.method == 'POST':
@@ -310,7 +303,7 @@ def new_milestone(request, slug, path=''):
 
             Change.objects.filter(milestone=0, repo=repo).update(milestone=milestone.id)
 
-            mil_path = PATH.joinpath('Repositories', Path(content_path), 'History')
+            mil_path = PATH.joinpath('Repositories', slug, 'History')
             shutil.make_archive(str(mil_path.joinpath(str(milestone.id))), 'zip', str(dir_path))
 
             return redirect('repo-detail', slug=slug)
@@ -321,11 +314,10 @@ def new_milestone(request, slug, path=''):
 
 @login_required
 def restore_repo(request, slug, mil_id):
-    name_of_repo = Repository.objects.get(slug=slug).name
-    content_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Content')
-    dir_path = PATH.joinpath('Repositories', Path(name_of_repo), 'Temporary')
-    milestone_path = PATH.joinpath('Repositories', Path(name_of_repo), 'History', str(mil_id) + '.zip')
-    new_mil_path = PATH.joinpath('Repositories', Path(name_of_repo), 'History')
+    content_path = PATH.joinpath('Repositories', slug, 'Content')
+    dir_path = PATH.joinpath('Repositories', slug, 'Temporary')
+    milestone_path = PATH.joinpath('Repositories', slug, 'History', str(mil_id) + '.zip')
+    new_mil_path = PATH.joinpath('Repositories', slug, 'History')
     os.mkdir(dir_path)
     shutil.unpack_archive(milestone_path, dir_path, "zip")
 
@@ -341,6 +333,23 @@ def restore_repo(request, slug, mil_id):
     # shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
 
     return redirect('repo-detail', slug=slug)
+
+
+@login_required
+def clone_repo(request, slug):
+    repo_path = PATH.joinpath('Repositories', slug)
+    name = Repository.objects.get(slug=slug).name
+    author = Repository.objects.get(slug=slug).author
+    new_repo = Repository.objects.create(name=name, author=author)
+    new_slug = new_repo.slug
+    new_path = PATH.joinpath('Repositories', new_slug)
+    shutil.copytree(repo_path, new_path)
+    return redirect('profile')
+
+
+@login_required
+def delete_repo(request, slug):
+    return HttpResponse('Yes 2')
 
 
 @login_required
@@ -406,9 +415,7 @@ class RepoDetailView(generic.DetailView):
         # Add in the publisher
         context["path"] = self.kwargs.get("path", '')
 
-        name = Repository.objects.get(slug=self.kwargs.get("slug")).name
-
-        pth = Path(PATH.joinpath("Repositories", name, "Content", self.kwargs.get("path", '')))
+        pth = Path(PATH.joinpath("Repositories", self.kwargs.get("slug"), "Content", self.kwargs.get("path", '')))
 
         # List of directories only
         context['dirlist'] = [x for x in os.listdir(pth) if os.path.isdir(os.path.join(pth, x))]

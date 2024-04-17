@@ -15,6 +15,14 @@
             {% for repo in repository_list %}
                 <div class="row-list">
                     <a href="{{ repo.slug }}">{{ repo.name }}</a>
+                    <div class="modify-buttons-block">
+                        <div class="button">
+                            <a href="{{ request.path|add:repo.slug|add:'/clonerepo' }}">Clone</a>
+                        </div>
+                        <div class="button">
+                            <a href="{{ request.path|add:repo.slug|add:'/deleterepo' }}">Delete</a>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
 

@@ -5,9 +5,13 @@ urlpatterns = [
     path('', views.profile_view, name='profile'),
     path('newrepo', views.new_repo, name='newrepo'),
 
+    path('<slug>/clonerepo', views.clone_repo, name='clonerepo'),
+    path('<slug>/deleterepo', views.delete_repo, name='deleterepo'),
+
     path('<slug>/<int:pk>/changes', views.ChangesListView.as_view(), name='changes'),
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
     path('<slug>/<int:mil_id>/restore', views.restore_repo, name='restore'),
+
 
     path('<slug>/users', views.UsersListView.as_view(), name='users_list'),
     path('<slug>/adduser', views.add_user, name='adduser'),

@@ -2,6 +2,7 @@ from django.db import models
 
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from autoslug import AutoSlugField
 
 
 class Repository(models.Model):
@@ -11,7 +12,7 @@ class Repository(models.Model):
 
     name = models.CharField(max_length=255)
     author = models.ForeignKey('auth.User', related_name='author', on_delete=models.CASCADE)
-    slug = models.SlugField(default="", null=False, unique=True)
+    slug = AutoSlugField(populate_from=name, unique=True)
     users = models.ManyToManyField('auth.User', related_name='user')
 
     def __str__(self):

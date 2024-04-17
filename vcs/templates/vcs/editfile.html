@@ -2,16 +2,17 @@
 
 {% block content %}
 
-<h1>Edit file</h1>
-<form method="POST" class="filedata">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <h1>Edit file</h1>
+    <form method="POST" class="filedata">
+        {% csrf_token %}
+        {{ form.as_p }}
         <div class="confirm-buttons">
             <button type="submit">Update</button>
-            <button type="button" onclick="location.href = '{% url 'file-or-dir-view' slug=slug path=path %}';">Back
+            <button type="button" onclick="location.href = '{% url 'file-or-dir-view' slug=slug path=path %}';">Cancel
             </button>
         </div>
-</form>
+        </div>
+    </form>
 
 
 {% endblock %}

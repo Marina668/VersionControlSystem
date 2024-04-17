@@ -2,16 +2,17 @@
 
 {% block content %}
 
-<h1>Edit directory</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <h1>Edit directory</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
         <div class="confirm-buttons">
             <button type="submit">Create</button>
-            <button type="button" onclick="location.href = '{% url 'file-or-dir-view' slug=slug path=path %}';">Back
+            <button type="button" onclick="location.href = '{{ request.path|cut:'/edit' }}';">Back
             </button>
         </div>
-</form>
+        </div>
+    </form>
 
 
 {% endblock %}
