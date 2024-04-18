@@ -33,12 +33,18 @@
         {% endif %}
 
 
-        <h3>Other Repositories: </h3>
 
         {% if other_repo_list %}
+            <h3>Other Repositories: </h3>
             {% for other_repo in other_repo_list %}
                 <div class="row-list">
                     <a href="{{ other_repo.slug }}">{{ other_repo.name }}</a>
+                    <div class="modify-buttons-block">
+                        <div class="button">
+                            <a href="{{ request.path|add:other_repo.slug|add:'/clonerepo' }}">Clone</a>
+                        </div>
+
+                    </div>
                 </div>
             {% endfor %}
         {% endif %}

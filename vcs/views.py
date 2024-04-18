@@ -61,7 +61,6 @@ def new_dir(request, slug, path=''):
     if request.method == 'POST':
         form = NewDirForm(request.POST)
         if form.is_valid():
-            content_path = Repository.objects.get(slug=slug).name
             dir_path = PATH.joinpath('Repositories', slug, 'Content', path,
                                      form.cleaned_data['name'])
             try:
@@ -83,7 +82,6 @@ def new_file(request, slug, path=''):
     if request.method == 'POST':
         form = NewFileForm(request.POST)
         if form.is_valid():
-            content_path = Repository.objects.get(slug=slug).name
             dir_path = PATH.joinpath('Repositories', slug, 'Content', path,
                                      form.cleaned_data['name'])
             try:
@@ -106,7 +104,6 @@ def upload_file(request, slug, path=''):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            content_path = Repository.objects.get(slug=slug).name
             filename = request.FILES["file"].name
             dir_path = PATH.joinpath('Repositories', slug, 'Content', path, filename)
 
@@ -132,18 +129,17 @@ def upload_file(request, slug, path=''):
 
 
 def get_global_path(path, slug):
-    content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
     with open(str(dir_path), "r") as f:
         file_content = f.read()
     path_parts = path.split('/')
     fname = path_parts[-1]
-    return file_content, fname, dir_path, path_parts, content_path
+    return file_content, fname, dir_path, path_parts
 
 
 @login_required
 def read_file(request, slug, path=''):
-    file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
+    file_content, fname, dir_path, path_parts = get_global_path(path, slug)
 
     context = {
         'file_name': fname,
@@ -176,7 +172,7 @@ def split_path(path):
 
 @login_required
 def edit_file(request, slug, path=''):
-    file_content, fname, dir_path, path_parts, content_path = get_global_path(path, slug)
+    file_content, fname, dir_path, path_parts = get_global_path(path, slug)
 
     if request.method == 'POST':
         form = NewFileForm(request.POST)
@@ -211,7 +207,6 @@ def edit_file(request, slug, path=''):
 
 @login_required
 def edit_dir(request, slug, path=''):
-    content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
 
     path_parts = path.split('/')
@@ -240,9 +235,7 @@ def edit_dir(request, slug, path=''):
 
 @login_required
 def delete(request, slug, path=''):
-    content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
-
     new_path, folders = split_path(path)
 
     if request.method == 'POST':
@@ -268,7 +261,6 @@ def delete(request, slug, path=''):
 
 @login_required
 def file_or_dir_view(request, slug, path=''):
-    content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', slug, 'Content', path)
     if os.path.isfile(dir_path):
         return read_file(request, slug=slug, path=path)
@@ -291,7 +283,6 @@ def breadcrumbs(slug, path=''):
 
 @login_required
 def new_milestone(request, slug, path=''):
-    content_path = Repository.objects.get(slug=slug).name
     dir_path = PATH.joinpath('Repositories', slug, 'Content')
     repo = get_object_or_404(Repository, slug=slug)
 
@@ -339,7 +330,10 @@ def restore_repo(request, slug, mil_id):
 def clone_repo(request, slug):
     repo_path = PATH.joinpath('Repositories', slug)
     name = Repository.objects.get(slug=slug).name
-    author = Repository.objects.get(slug=slug).author
+    if Repository.objects.get(slug=slug).author == request.user:
+        author = Repository.objects.get(slug=slug).author
+    else:
+        author = request.user
     new_repo = Repository.objects.create(name=name, author=author)
     new_slug = new_repo.slug
     new_path = PATH.joinpath('Repositories', new_slug)
@@ -349,7 +343,17 @@ def clone_repo(request, slug):
 
 @login_required
 def delete_repo(request, slug):
-    return HttpResponse('Yes 2')
+    repo_path = PATH.joinpath('Repositories', slug)
+    if request.method == 'POST':
+        Repository.objects.filter(slug=slug).delete()
+        shutil.rmtree(repo_path)
+        return redirect('profile')
+
+    context = {
+        'repo_name': Repository.objects.get(slug=slug).name,
+    }
+
+    return render(request, 'vcs/delete_repo.html', context)
 
 
 @login_required

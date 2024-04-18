@@ -8,8 +8,7 @@
         {{ form.as_p }}
         <div class="confirm-buttons">
             <button type="submit">Create</button>
-            <button type="button" onclick="location.href = '{{ request.path|cut:'/newmilestone' }}';">Back
-            </button>
+            <button type="button" onclick="location.href = '{{ request.path|cut:'/newmilestone' }}';">Cancel</button>
         </div>
     </form>
 
