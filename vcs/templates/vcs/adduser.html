@@ -4,10 +4,20 @@
 
     <h1>Choose user</h1>
     <form method="POST">
-        {% csrf_token %}
         {{ form.as_p }}
-{#        <p>{{'Input username'}}:{{form.username}}</p>#}
-{#        <p>{{'Or select from list'}}:{{form.name}}</p>#}
+{#        <label for="username">Username</label>#}
+{#        <input id="username">#}
+        {% csrf_token %}
+
+
+{#        <script>#}
+{#            $(function () {#}
+{#                $("#username").autocomplete({#}
+{#                    source: '{% url 'adduser' slug=slug %}',#}
+{#                });#}
+{#            });#}
+{#        </script>#}
+
         <div class="confirm-buttons">
             <button type="submit">Add</button>
             <button type="button" onclick="location.href = '{% url 'users_list' slug=slug %}';">Cancel</button>

@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.views import generic
-from django.http import HttpResponse
+from django.views import generic, View
+from django.http import HttpResponse, JsonResponse
+from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -202,7 +203,7 @@ def edit_file(request, slug, path=''):
     else:
         form = NewFileForm(initial={'name': fname, 'content': file_content})
 
-    return render(request, 'vcs/editfile.html', {'form': form, 'slug': slug, 'path': split_path(path)})
+    return render(request, 'vcs/editfile.html', {'form': form, 'slug': slug, 'path': path, 'file_name': '/' + fname})
 
 
 @login_required
@@ -230,7 +231,8 @@ def edit_dir(request, slug, path=''):
                 return redirect('file-or-dir-view', slug=slug, path='/' + pth + form.cleaned_data['name'])
     else:
         form = NewDirForm(initial={'name': dir_name})
-    return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': path})
+
+    return render(request, 'vcs/editdir.html', {'form': form, 'slug': slug, 'path': path, 'dir_name': '/' + dir_name})
 
 
 @login_required
@@ -367,10 +369,24 @@ def add_user(request, slug):
             repo.users.add(user)
             return redirect('repo-detail', slug=slug)
 
+    if 'term' in request.GET:
+        users = User.objects.filter(username__icontains=request.GET.get('term'))
+        usernames = [user.username for user in users]
+        return JsonResponse(usernames, safe=False)
+
     else:
         form = AddUserForm()
 
     return render(request, 'vcs/adduser.html', {'form': form, 'slug': slug})
+
+
+# @login_required
+# def autocomplete(request):
+#     if 'term' in request.GET:
+#         users = User.objects.filter(username__icontains=request.GET.get('term'))
+#         usernames = [user.username for user in users]
+#         return JsonResponse(usernames, safe=False)
+#     return render(request, 'vcs/adduser.html')
 
 
 @login_required

@@ -12,7 +12,6 @@ urlpatterns = [
     path('<slug>/history', views.MilestonesListView.as_view(), name='history'),
     path('<slug>/<int:mil_id>/restore', views.restore_repo, name='restore'),
 
-
     path('<slug>/users', views.UsersListView.as_view(), name='users_list'),
     path('<slug>/adduser', views.add_user, name='adduser'),
     path('<slug>/<str:username>/deleteuser', views.delete_user, name='deleteuser'),
@@ -26,9 +25,7 @@ urlpatterns = [
 
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newmilestone$', views.new_milestone, name='newmilestone'),
 
-
     re_path(r'^(?P<slug>[\w-]+)$', views.RepoDetailView.as_view(), name='repo-detail'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %.\w\/]+)$', views.file_or_dir_view, name='file-or-dir-view'),
-
 
 ]

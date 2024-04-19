@@ -8,7 +8,7 @@
         {{ form.as_p }}
         <div class="confirm-buttons">
             <button type="submit">Update</button>
-            <button type="button" onclick="location.href = '{% url 'file-or-dir-view' slug=slug path=path %}';">Cancel
+            <button type="button" onclick="location.href = '{{ request.path|cut:file_name|cut:'/edit' }}';">Cancel
             </button>
         </div>
         </div>
