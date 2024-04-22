@@ -23,6 +23,9 @@
     <div class="button">
         <a href="{% url 'users_list' repository.slug %}">Users</a>
     </div>
+    <div class="button">
+        <a href="{% url 'download' repository.slug %}">Download</a>
+    </div>
 {% endblock %}
 
 {% block content %}

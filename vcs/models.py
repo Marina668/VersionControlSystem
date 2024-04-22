@@ -63,6 +63,7 @@ class Change(models.Model):
         ('a', 'added'),
         ('d', 'deleted'),
         ('m', 'modified'),
+        ('r', 'restored')
     )
 
     change_type = models.CharField(max_length=1, choices=CHANGES)

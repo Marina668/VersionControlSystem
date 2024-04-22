@@ -16,6 +16,8 @@ urlpatterns = [
     path('<slug>/adduser', views.add_user, name='adduser'),
     path('<slug>/<str:username>/deleteuser', views.delete_user, name='deleteuser'),
 
+    path('<slug>/download', views.download_repo, name='download'),
+
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newdir$', views.new_dir, name='newdir'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/newfile$', views.new_file, name='newfile'),
     re_path(r'^(?P<slug>[\w-]+)\/?(?P<path>[- %\w\/]+)?/uploadfile$', views.upload_file, name='uploadfile'),

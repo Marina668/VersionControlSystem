@@ -46,6 +46,10 @@ def new_repo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
+def download_repo(request, slug):
+    return HttpResponse("Yes")
+
+
 def get_path(form, path, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if path == '':
@@ -317,13 +321,18 @@ def restore_repo(request, slug, mil_id):
     shutil.rmtree(content_path)
     os.rename(dir_path, content_path)
 
-    # mil_description = Milestone.objects.get(id=mil_id).description
-    # repo = get_object_or_404(Repository, slug=slug)
-    # milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
-    #                       repo=repo)
-    # milestone.save()
+    mil_description = Milestone.objects.get(id=mil_id).description
+    mil_id = Milestone.objects.get(id=mil_id).id
+    repo = get_object_or_404(Repository, slug=slug)
+    milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
+                          repo=repo)
+    milestone.save()
 
-    # shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
+    change = Change(item=mil_id, change_type='r', milestone=milestone.id,
+                    repo=repo)
+    change.save()
+
+    shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
 
     return redirect('repo-detail', slug=slug)
 
