@@ -10,13 +10,13 @@
         {% csrf_token %}
 
 
-{#        <script>#}
-{#            $(function () {#}
-{#                $("#username").autocomplete({#}
-{#                    source: '{% url 'adduser' slug=slug %}',#}
-{#                });#}
-{#            });#}
-{#        </script>#}
+        <script>
+            $(function () {
+                $("#username").autocomplete({
+                    source: '{% url 'adduser' slug=slug %}',
+                });
+            });
+        </script>
 
         <div class="confirm-buttons">
             <button type="submit">Add</button>

@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils.encoding import smart_str
 from django.views import generic, View
-from django.http import HttpResponse, JsonResponse
-from dal import autocomplete
+from django.http import HttpResponse, JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -366,6 +366,20 @@ def delete_repo(request, slug):
 
     return render(request, 'vcs/delete_repo.html', context)
 
+@login_required
+def download_repo(request, slug):
+    content_path = PATH.joinpath('Repositories', slug, 'Content')
+    temp_dir = PATH.joinpath('Repositories', slug, 'Temporary')
+    shutil.make_archive(str(temp_dir.joinpath(slug)), 'zip', str(content_path))
+
+    filename = str(slug) + '.zip'
+    filepath = temp_dir.joinpath(str(slug) + '.zip')
+
+    with open(filepath, 'rb') as myzip:
+        response = HttpResponse(myzip.read(), content_type="application/zip")
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+    shutil.rmtree(temp_dir)
+    return response
 
 @login_required
 def add_user(request, slug):
@@ -378,10 +392,10 @@ def add_user(request, slug):
             repo.users.add(user)
             return redirect('repo-detail', slug=slug)
 
-    if 'term' in request.GET:
-        users = User.objects.filter(username__icontains=request.GET.get('term'))
-        usernames = [user.username for user in users]
-        return JsonResponse(usernames, safe=False)
+    # if 'term' in request.GET:
+    #     users = User.objects.filter(username__icontains=request.GET.get('term'))
+    #     usernames = [user.username for user in users]
+    #     return JsonResponse(usernames, safe=False)
 
     else:
         form = AddUserForm()
