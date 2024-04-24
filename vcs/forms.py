@@ -1,6 +1,7 @@
 from django import forms
 from dal import autocomplete
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 from vcs.models import Repository
 
@@ -31,8 +32,15 @@ class NewMilestoneForm(forms.Form):
 
 
 class AddUserForm(forms.Form):
-    # username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+    username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
 
-    username = forms.ModelChoiceField(queryset=User.objects.all(), empty_label='Select user')
-
-
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     username = cleaned_data.get('username')
+    #
+    #     if not User.objects.filter(username=username).exists():
+    #         # raise ValidationError(
+    #         #     "The user don`t exist"
+    #         # )
+    #
+    #         self.add_error('username', 'The user don`t exist')

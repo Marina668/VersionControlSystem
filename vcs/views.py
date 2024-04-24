@@ -46,10 +46,6 @@ def new_repo(request):
     return render(request, 'vcs/newrepo.html', {'form': form})
 
 
-def download_repo(request, slug):
-    return HttpResponse("Yes")
-
-
 def get_path(form, path, slug):
     repo = get_object_or_404(Repository, slug=slug)
     if path == '':
@@ -366,6 +362,7 @@ def delete_repo(request, slug):
 
     return render(request, 'vcs/delete_repo.html', context)
 
+
 @login_required
 def download_repo(request, slug):
     content_path = PATH.joinpath('Repositories', slug, 'Content')
@@ -381,6 +378,7 @@ def download_repo(request, slug):
     shutil.rmtree(temp_dir)
     return response
 
+
 @login_required
 def add_user(request, slug):
     if request.method == 'POST':
@@ -390,26 +388,18 @@ def add_user(request, slug):
             username = form.cleaned_data['username']
             user = get_object_or_404(User, username=username)
             repo.users.add(user)
-            return redirect('repo-detail', slug=slug)
+            return redirect('users_list', slug=slug)
 
-    # if 'term' in request.GET:
-    #     users = User.objects.filter(username__icontains=request.GET.get('term'))
-    #     usernames = [user.username for user in users]
-    #     return JsonResponse(usernames, safe=False)
+
+    if 'term' in request.GET:
+        users = User.objects.filter(username__icontains=request.GET.get('term'))
+        usernames = [user.username for user in users]
+        return JsonResponse(usernames, safe=False)
 
     else:
         form = AddUserForm()
 
     return render(request, 'vcs/adduser.html', {'form': form, 'slug': slug})
-
-
-# @login_required
-# def autocomplete(request):
-#     if 'term' in request.GET:
-#         users = User.objects.filter(username__icontains=request.GET.get('term'))
-#         usernames = [user.username for user in users]
-#         return JsonResponse(usernames, safe=False)
-#     return render(request, 'vcs/adduser.html')
 
 
 @login_required
@@ -521,6 +511,7 @@ class ChangesListView(generic.ListView):
 
         context['repo_slug'] = Milestone.objects.get(pk=self.kwargs.get("pk")).repo.slug
         context['milestone_id'] = self.kwargs.get("pk")
+        context['milestone_name'] = Milestone.objects.get(pk=self.kwargs.get("pk")).description
 
         return context
 

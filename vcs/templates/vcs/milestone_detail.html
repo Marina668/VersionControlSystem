@@ -14,9 +14,7 @@
 
 {% block content %}
 
-    <h1>Changes: </h1>
-
-
+    <h1> {{ milestone_name }} </h1>
 
     {% for change in change_list %}
         <div class="row-list">
@@ -27,8 +25,9 @@
                     {{ change.get_change_type_display }}
                 </div>
             {% else %}
-                <div>Repository is restored to the</div>
-                <a href="{% url 'changes' repo_slug change.item %}">milestone</a>
+                <div>Repository is restored to the
+                    <a href="{% url 'changes' repo_slug change.item %}">milestone</a>
+                </div>
             {% endif %}
         </div>
     {% endfor %}

@@ -1,22 +1,32 @@
 {% extends "vcs/base.html" %}
 
+
+
 {% block content %}
+
+    <script src=
+                    "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+    </script>
+    <script src=
+                    "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+    </script>
+    <link href=
+                  "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
+          rel="stylesheet" type="text/css"/>
+
+    <script>
+        $(function () {
+            $("#id_username").autocomplete({
+                source: '{% url 'adduser' slug=slug %}',
+            });
+        });
+    </script>
+
 
     <h1>Choose user</h1>
     <form method="POST">
         {{ form.as_p }}
-{#        <label for="username">Username</label>#}
-{#        <input id="username">#}
         {% csrf_token %}
-
-
-        <script>
-            $(function () {
-                $("#username").autocomplete({
-                    source: '{% url 'adduser' slug=slug %}',
-                });
-            });
-        </script>
 
         <div class="confirm-buttons">
             <button type="submit">Add</button>
