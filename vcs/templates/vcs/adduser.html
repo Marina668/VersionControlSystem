@@ -28,6 +28,10 @@
         {{ form.as_p }}
         {% csrf_token %}
 
+{#        {% for error in form.username.errors %}#}
+{#            {{ error }}#}
+{#        {% endfor %}#}
+
         <div class="confirm-buttons">
             <button type="submit">Add</button>
             <button type="button" onclick="location.href = '{% url 'users_list' slug=slug %}';">Cancel</button>

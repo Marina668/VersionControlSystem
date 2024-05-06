@@ -3,7 +3,7 @@
 {% block content %}
 
     <h1>Upload file</h1>
-    <form method="POST" class="filedata" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="confirm-buttons">

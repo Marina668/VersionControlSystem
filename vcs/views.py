@@ -390,7 +390,6 @@ def add_user(request, slug):
             repo.users.add(user)
             return redirect('users_list', slug=slug)
 
-
     if 'term' in request.GET:
         users = User.objects.filter(username__icontains=request.GET.get('term'))
         usernames = [user.username for user in users]

@@ -37,10 +37,7 @@ class AddUserForm(forms.Form):
     # def clean(self):
     #     cleaned_data = super().clean()
     #     username = cleaned_data.get('username')
-    #
     #     if not User.objects.filter(username=username).exists():
-    #         # raise ValidationError(
-    #         #     "The user don`t exist"
-    #         # )
-    #
-    #         self.add_error('username', 'The user don`t exist')
+    #         raise forms.ValidationError("The user don`t exist")
+    #         # self.add_error('username', 'The user don`t exist')
+    #     return username

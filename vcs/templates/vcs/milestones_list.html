@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
     <div class="button">
-         <a href="{% url 'repo-detail' repo_slug %}">Back</a>
+        <a href="{% url 'repo-detail' repo_slug %}">Back</a>
     </div>
 {% endblock %}
 
@@ -19,7 +19,9 @@
 
         </ul>
     {% else %}
-        <p>There are no milestones in this repository.</p>
+        <div class="nothing">
+            There are no milestones in this repository.
+        </div>
     {% endif %}
 
 
