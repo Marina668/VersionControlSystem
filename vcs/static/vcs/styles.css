@@ -224,3 +224,24 @@ h3 {
     font-weight: bold;
     white-space: pre;
 }
+
+.row-list .ms-description {
+    width: 250px;
+}
+
+.row-list .ms-date {
+    width: 150px;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.row-list .ms-author {
+    width: 120px;
+    text-align: right;
+    margin-left: 20px;
+}
+
+.row-list .ms-date-author {
+    display: inline-flex;
+    justify-content: end;
+}

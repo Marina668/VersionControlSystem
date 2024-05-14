@@ -12,9 +12,13 @@
     {% if milestone_list %}
         {% for milestone in milestone_list %}
             <div class="row-list">
-                <a href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
-                {{ milestone.created }}
-                {{ milestone.author }}
+                <div class="ms-description"><a
+                        href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
+                </div>
+                <div class="ms-date-author">
+                    <div class="ms-date">{{ milestone.created|date:"d.m.y H:i" }}</div>
+                    <div class="ms-author">{{ milestone.author }}</div>
+                </div>
             </div>
         {% endfor %}
     {% else %}
