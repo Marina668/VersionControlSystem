@@ -471,6 +471,7 @@ class UsersListView(generic.ListView):
 
         context['repo_slug'] = self.kwargs.get("slug")
         context['repo_author'] = Repository.objects.get(slug=self.kwargs.get("slug")).author
+        context['user'] = self.request.user
 
         return context
 

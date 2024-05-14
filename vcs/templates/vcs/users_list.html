@@ -7,9 +7,12 @@
 {% endblock %}
 
 {% block top-buttons %}
-    <div class="button">
-        <a href="{% url 'adduser' repo_slug %}">Add user</a>
-    </div>
+    {% if repo_author == user %}
+        <div class="button">
+            <a href="{% url 'adduser' repo_slug %}">Add user</a>
+        </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -25,11 +28,13 @@
         {% for user in user_list %}
             <div class="row-list">
                 {{ user.username }}
-                <div class="modify-buttons-block">
-                    <div class="button">
-                        <a href="{{ request.path|cut:'/users'|add:'/'|add:user.username|urlencode|add:'/deleteuser' }}">Delete</a>
+                {% if repo_author == user %}
+                    <div class="modify-buttons-block">
+                        <div class="button">
+                            <a href="{{ request.path|cut:'/users'|add:'/'|add:user.username|urlencode|add:'/deleteuser' }}">Delete</a>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         {% endfor %}
 

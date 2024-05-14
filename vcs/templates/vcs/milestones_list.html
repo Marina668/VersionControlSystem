@@ -10,14 +10,13 @@
 
     <h1>Milestones: </h1>
     {% if milestone_list %}
-        <ul>
-            {% for milestone in milestone_list %}
-                <div class="row-list">
-                    <a href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
-                </div>
-            {% endfor %}
-
-        </ul>
+        {% for milestone in milestone_list %}
+            <div class="row-list">
+                <a href="{% url 'changes' milestone.repo.slug milestone.id %}">{{ milestone.description }}</a>
+                {{ milestone.created }}
+                {{ milestone.author }}
+            </div>
+        {% endfor %}
     {% else %}
         <div class="nothing">
             There are no milestones in this repository.
