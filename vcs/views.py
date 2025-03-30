@@ -1,20 +1,19 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.utils.encoding import smart_str
-from django.views import generic, View
-from django.http import HttpResponse, JsonResponse, Http404
+from django.views import generic
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .models import Repository, Change, Milestone
+
+from .models import Change, Milestone
 from .forms import *
 import os
 import shutil
 from pathlib import Path
+
+
+from django.http import JsonResponse
 
 PATH = Path(__file__).resolve().parent.parent.parent
 
@@ -423,11 +422,9 @@ class RepositoryListView(generic.ListView):
     template_name = 'vcs/profile.html'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in the publisher
-        context["path"] = self.kwargs.get("path", '')
 
+        context["path"] = self.kwargs.get("path", '')
         context['other_repo_list'] = Repository.objects.filter(users=self.request.user)
 
         return context
@@ -442,9 +439,8 @@ class RepoDetailView(generic.DetailView):
     template_name = 'vcs/repo_detail.html'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in the publisher
+
         context["path"] = self.kwargs.get("path", '')
 
         pth = Path(PATH.joinpath("Repositories", self.kwargs.get("slug"), "Content", self.kwargs.get("path", '')))
@@ -486,9 +482,7 @@ class MilestonesListView(generic.ListView):
     template_name = 'vcs/milestones_list.html'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in the publisher
 
         context['repo_slug'] = self.kwargs.get("slug")
 
@@ -505,9 +499,7 @@ class ChangesListView(generic.ListView):
     template_name = 'vcs/milestone_detail.html'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in the publisher
 
         context['repo_slug'] = Milestone.objects.get(pk=self.kwargs.get("pk")).repo.slug
         context['milestone_id'] = self.kwargs.get("pk")

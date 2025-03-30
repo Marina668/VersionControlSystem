@@ -28,7 +28,7 @@
         {% for user in user_list %}
             <div class="row-list">
                 {{ user.username }}
-                {% if repo_author == user %}
+                {% if repo_author != user %}
                     <div class="modify-buttons-block">
                         <div class="button">
                             <a href="{{ request.path|cut:'/users'|add:'/'|add:user.username|urlencode|add:'/deleteuser' }}">Delete</a>
