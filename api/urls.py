@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import UserRepositoriesView
+from .views import UserRepositoriesView, NewRepoView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('register/', views.UserRegistrationView.as_view(), name='user-register'),
-    # path('repos/', views.repo_list, name='repo-list'),
+
+    path('newrepo/', NewRepoView.as_view(), name='newrepo'),
     path('repositories/', UserRepositoriesView.as_view(), name='user-repositories'),
 ]
