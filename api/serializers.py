@@ -42,3 +42,13 @@ class RenameDirectorySerializer(serializers.Serializer):
     new_name = serializers.CharField(max_length=255)
     repo_id = serializers.IntegerField()
     path = serializers.CharField(required=False, allow_blank=True)
+
+
+class FileSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    content = serializers.CharField(required=False, allow_blank=True)
+    repo_id = serializers.IntegerField()
+    path = serializers.CharField(required=False, allow_blank=True)
+
+    def create(self, validated_data):
+        return validated_data
