@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import UserRepositoriesView, NewRepoView
+from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -22,5 +22,11 @@ urlpatterns = [
     # path('register/', views.UserRegistrationView.as_view(), name='user-register'),
 
     path('newrepo/', NewRepoView.as_view(), name='newrepo'),
+
+    path('deleterepo/<int:repo_id>', DeleteRepo.as_view(), name='deleterepo'),
     path('repositories/', UserRepositoriesView.as_view(), name='user-repositories'),
+    path('clonerepo/<int:repo_id>', CloneRepoView.as_view(), name='clonerepo'),
+
+    path('newdir/', NewDirView.as_view(), name='newdir'),
+    path('editdir/', EditDirView.as_view(), name='editdir'),
 ]
