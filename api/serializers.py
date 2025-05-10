@@ -65,6 +65,13 @@ class FileSerializer(serializers.Serializer):
         return validated_data
 
 
+class RenameFileSerializer(serializers.Serializer):
+    new_name = serializers.CharField(max_length=255)
+    new_content = serializers.CharField(required=False, allow_blank=True)
+    repo_id = serializers.IntegerField()
+    path = serializers.CharField(required=False, allow_blank=True)
+
+
 class UsersSerializer(serializers.ModelSerializer):
     is_author = serializers.SerializerMethodField()
     class Meta:

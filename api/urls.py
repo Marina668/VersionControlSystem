@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView, NewFileView, \
-    UsersView, DeleteUserView, AddUserView
+    UsersView, DeleteUserView, AddUserView, EditFileView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -32,6 +32,8 @@ urlpatterns = [
     path('editdir/', EditDirView.as_view(), name='editdir'),
 
     path('newfile/', NewFileView.as_view(), name='newfile'),
+
+    path('editfile/', EditFileView.as_view(), name='editfile'),
 
     path('users/<int:repo_id>', UsersView.as_view(), name='users'),
 
