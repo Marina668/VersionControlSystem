@@ -29,6 +29,17 @@ class RepositorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 
+class RepositoryListSerializer(serializers.ModelSerializer):
+    is_author = serializers.SerializerMethodField()
+    class Meta:
+        model = Repository
+        fields = ['id', 'name', 'slug', 'is_author']
+
+    def get_is_author(self, obj):
+        author = self.context.get('author')
+        return obj.author.id == author.id if author else False
+
+
 class DirectorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     repo_id = serializers.IntegerField()
@@ -52,3 +63,19 @@ class FileSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return validated_data
+
+
+class UsersSerializer(serializers.ModelSerializer):
+    is_author = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'is_author']
+
+    def get_is_author(self, obj):
+        author = self.context.get('author')
+        return obj.id == author.id if author else False
+
+
+class UserAddDeleteSerializer(serializers.Serializer):
+    repo_id = serializers.IntegerField()
+    username = serializers.CharField(max_length=255)

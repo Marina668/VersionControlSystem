@@ -32,11 +32,3 @@ class NewMilestoneForm(forms.Form):
 
 class AddUserForm(forms.Form):
     username = forms.CharField(max_length=255, initial='', widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
-
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     username = cleaned_data.get('username')
-    #     if not User.objects.filter(username=username).exists():
-    #         raise forms.ValidationError("The user don`t exist")
-    #         # self.add_error('username', 'The user don`t exist')
-    #     return username
