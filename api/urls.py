@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView, NewFileView, \
-    UsersView, DeleteUserView, AddUserView, EditFileView
+    UsersView, DeleteUserView, AddUserView, EditFileView, DeleteView, DownloadRepoView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -27,6 +27,7 @@ urlpatterns = [
     path('deleterepo/<int:repo_id>', DeleteRepo.as_view(), name='deleterepo'),
     path('repositories/', UserRepositoriesView.as_view(), name='user-repositories'),
     path('clonerepo/<int:repo_id>', CloneRepoView.as_view(), name='clonerepo'),
+    path('downloadrepo/<int:repo_id>', DownloadRepoView.as_view(), name='downloadrepo'),
 
     path('newdir/', NewDirView.as_view(), name='newdir'),
     path('editdir/', EditDirView.as_view(), name='editdir'),
@@ -35,9 +36,11 @@ urlpatterns = [
 
     path('editfile/', EditFileView.as_view(), name='editfile'),
 
+    path('delete/<int:repo_id>/<path:path>/', DeleteView.as_view(), name='delete'),
+
     path('users/<int:repo_id>', UsersView.as_view(), name='users'),
 
     path('adduser/', AddUserView.as_view(), name='adduser'),
 
-    path('deleteuser/<int:repo_id>/<username>', DeleteUserView.as_view(), name='deleteuser'),
+    path('deleteuser/<int:repo_id>/<str:username>', DeleteUserView.as_view(), name='deleteuser'),
 ]
