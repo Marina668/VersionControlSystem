@@ -2,7 +2,8 @@ from django.urls import path
 
 from . import views
 from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView, NewFileView, \
-    UsersView, DeleteUserView, AddUserView, EditFileView, DeleteView, DownloadRepoView, UploadFileView
+    UsersView, DeleteUserView, AddUserView, EditFileView, DeleteView, DownloadRepoView, UploadFileView, \
+    CreateMilestoneView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -44,4 +45,6 @@ urlpatterns = [
     path('adduser/', AddUserView.as_view(), name='adduser'),
 
     path('deleteuser/<int:repo_id>/<str:username>', DeleteUserView.as_view(), name='deleteuser'),
+
+    path('createmilestone/', CreateMilestoneView.as_view(), name='createmilestone'),
 ]

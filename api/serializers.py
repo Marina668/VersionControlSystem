@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from vcs.models import Repository
+from vcs.models import Repository, Milestone
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -86,3 +86,9 @@ class UsersSerializer(serializers.ModelSerializer):
 class UserAddDeleteSerializer(serializers.Serializer):
     repo_id = serializers.IntegerField()
     username = serializers.CharField(max_length=255)
+
+
+class MilestoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Milestone
+        fields = ['id', 'description', 'repo']
