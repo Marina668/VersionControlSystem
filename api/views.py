@@ -18,7 +18,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from api.serializers import UserRegistrationSerializer, RepositorySerializer, DirectorySerializer, \
     RenameDirectorySerializer, FileSerializer, UsersSerializer, UserAddDeleteSerializer, RepositoryListSerializer, \
-    RenameFileSerializer, MilestoneSerializer
+    RenameFileSerializer, MilestoneSerializer, MilestonesListSerializer, ChangesListSerializer, RestoreRepoSerializer
 from vcs.models import Repository, Milestone, Change
 
 PATH = Path(__file__).resolve().parent.parent.parent
@@ -555,3 +555,83 @@ class CreateMilestoneView(CreateAPIView):
             },
             status=status.HTTP_201_CREATED
         )
+
+
+class MilestonesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, repo_id):
+        try:
+            repo = Repository.objects.get(id=repo_id)
+        except Repository.DoesNotExist:
+            return Response({"detail": "Repository not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        if user != repo.author and not repo.users.filter(id=user.id).exists():
+            return Response({"detail": "You do not have access to this repository."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        milestones = Milestone.objects.filter(repo=repo)
+        serializer = MilestonesListSerializer(milestones, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, milestone_id):
+        milestone = Milestone.objects.get(id=milestone_id)
+        repo = Repository.objects.get(id=milestone.repo.id)
+        user = request.user
+        if user != repo.author and not repo.users.filter(id=user.id).exists():
+            return Response({"detail": "You do not have access to this repository."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        changes = Change.objects.filter(milestone=milestone_id)
+        serializer = ChangesListSerializer(changes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RestoreRepoView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RestoreRepoSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        repo_id = serializer.validated_data['repo_id']
+        milestone_id = serializer.validated_data['milestone_id']
+
+        try:
+            repo = Repository.objects.get(id=repo_id)
+        except Repository.DoesNotExist:
+            return Response({"detail": "Repository not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user != repo.author and not repo.users.filter(id=request.user.id).exists():
+            return Response({"detail": "You do not have access to this repository."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        content_path = PATH.joinpath('Repositories', repo.slug, 'Content')
+        dir_path = PATH.joinpath('Repositories', repo.slug, 'Temporary')
+        milestone_path = PATH.joinpath('Repositories', repo.slug, 'History', str(milestone_id) + '.zip')
+        new_mil_path = PATH.joinpath('Repositories', repo.slug, 'History')
+        os.mkdir(dir_path)
+        shutil.unpack_archive(milestone_path, dir_path, "zip")
+
+        shutil.rmtree(content_path)
+        os.rename(dir_path, content_path)
+
+        mil_description = Milestone.objects.get(id=milestone_id).description
+        mil_id = Milestone.objects.get(id=milestone_id).id
+        milestone = Milestone(description="repository is restored to the " + str(mil_description), author=request.user,
+                              repo=repo)
+        milestone.save()
+
+        change = Change(item=mil_id, change_type='r', milestone=milestone.id, repo=repo)
+        change.save()
+
+        shutil.make_archive(str(new_mil_path.joinpath(str(milestone.id))), 'zip', str(content_path))
+
+        return Response({'detail': f"Repository restored to the milestone '{mil_description}'."},
+                        status=status.HTTP_200_OK)

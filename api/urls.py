@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView, NewFileView, \
     UsersView, DeleteUserView, AddUserView, EditFileView, DeleteView, DownloadRepoView, UploadFileView, \
-    CreateMilestoneView
+    CreateMilestoneView, MilestonesView, ChangesView, RestoreRepoView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -47,4 +47,10 @@ urlpatterns = [
     path('deleteuser/<int:repo_id>/<str:username>', DeleteUserView.as_view(), name='deleteuser'),
 
     path('createmilestone/', CreateMilestoneView.as_view(), name='createmilestone'),
+
+    path('history/<int:repo_id>', MilestonesView.as_view(), name='history'),
+
+    path('changes/<int:milestone_id>', ChangesView.as_view(), name='changes'),
+
+    path('restore/', RestoreRepoView.as_view(), name='restore'),
 ]

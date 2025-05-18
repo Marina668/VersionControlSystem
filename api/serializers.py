@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from vcs.models import Repository, Milestone
+from vcs.models import Repository, Milestone, Change
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -92,3 +92,23 @@ class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Milestone
         fields = ['id', 'description', 'repo']
+
+class MilestonesListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Milestone
+        fields = ['id', 'description', 'created', 'author']
+
+
+class ChangesListSerializer(serializers.ModelSerializer):
+    change_type = serializers.SerializerMethodField()
+    class Meta:
+        model = Change
+        fields = ['item', 'change_type']
+
+    def get_change_type(self, obj):
+        return obj.get_change_type_display()
+
+
+class RestoreRepoSerializer(serializers.Serializer):
+    repo_id = serializers.IntegerField()
+    milestone_id = serializers.IntegerField()
