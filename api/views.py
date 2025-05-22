@@ -8,13 +8,11 @@ from drf_spectacular.utils import extend_schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404, \
-    UpdateAPIView, GenericAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.generics import CreateAPIView, UpdateAPIView, GenericAPIView
 from rest_framework.response import Response
-from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import UserRegistrationSerializer, RepositorySerializer, DirectorySerializer, \
     RenameDirectorySerializer, FileSerializer, UsersSerializer, UserAddDeleteSerializer, RepositoryListSerializer, \
@@ -24,21 +22,23 @@ from vcs.models import Repository, Milestone, Change
 PATH = Path(__file__).resolve().parent.parent.parent
 
 
-# class UserRegistrationView(APIView):
-#     def post(self, request):
-#         serializer = UserRegistrationSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({'message': 'Користувач успішно зареєстрований'}, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class UserRegistrationView(CreateAPIView):
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [AllowAny]
 
-
-# def get_user_id_from_token(token):
-#     try:
-#         decoded_token = AccessToken(token)
-#         return decoded_token['user_id']
-#     except Exception as e:
-#         return None
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "user": {
+                "username": user.username,
+                "email": user.email
+            },
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }, status=status.HTTP_201_CREATED)
 
 
 class NewRepoView(CreateAPIView):

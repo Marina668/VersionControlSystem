@@ -1,9 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import UserRepositoriesView, NewRepoView, NewDirView, DeleteRepo, EditDirView, CloneRepoView, NewFileView, \
-    UsersView, DeleteUserView, AddUserView, EditFileView, DeleteView, DownloadRepoView, UploadFileView, \
-    CreateMilestoneView, MilestonesView, ChangesView, RestoreRepoView
+from .views import *
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -21,7 +19,8 @@ urlpatterns = [
 
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # path('register/', views.UserRegistrationView.as_view(), name='user-register'),
+
+    path('registration/', views.UserRegistrationView.as_view(), name='user-register'),
 
     path('newrepo/', NewRepoView.as_view(), name='newrepo'),
 
